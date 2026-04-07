@@ -27,18 +27,33 @@ public class ProduitsController {
 
     private final ProduitServices produitServices;
 
-    // On fait un get des produits
+    /**
+     * GET /api/produits - Récupère tous les produits
+     */
     @GetMapping
     public List<Produit> getProduits() {
         return produitServices.getAllProduits();
     }
 
-    @PostMapping("/createProduits")
-    public ResponseEntity<Produit> CreateProduits(@RequestBody Produit produit) {
+    /**
+     * GET /api/produits/{id} - Récupère un produit par ID
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Produit> getProduitById(@PathVariable UUID id) {
+        Produit produit = produitServices.getProduitsById(id);
+        return ResponseEntity.ok(produit);
+    }
+
+    /**
+     * POST /api/produits - Crée un nouveau produit
+     */
+    @PostMapping
+    public ResponseEntity<Produit> createProduit(@RequestBody Produit produit) {
         Produit savedProduit = produitServices.CreateProduits(produit);
 
         URI locationUri = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
+                .fromCurrentRequest()
+                .path("/{id}")
                 .buildAndExpand(savedProduit.getId())
                 .toUri();
 
@@ -47,22 +62,20 @@ public class ProduitsController {
                 .body(savedProduit);
     }
 
-    // get by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Produit> getProduitById(@PathVariable UUID id) {
-        Produit produit = produitServices.getProduitsById(id);
-        return ResponseEntity.ok(produit);
-    }
-
-    @PutMapping("UpdateProduits/{id}")
-    public ResponseEntity<Produit> updateProduits(@PathVariable UUID id, @RequestBody Produit produitDetails) {
+    /**
+     * PUT /api/produits/{id} - Met à jour un produit existant
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Produit> updateProduit(@PathVariable UUID id, @RequestBody Produit produitDetails) {
         Produit produit = produitServices.updateProduit(produitDetails, id);
         return ResponseEntity.ok(produit);
     }
 
-    // on supprime un produit
-    @DeleteMapping("DeleteProduit/{id}")
-    public ResponseEntity<Produit> deleteProduit(@PathVariable UUID id) {
+    /**
+     * DELETE /api/produits/{id} - Supprime un produit
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduit(@PathVariable UUID id) {
         produitServices.deleteProduitById(id);
         return ResponseEntity.noContent().build();
     }
