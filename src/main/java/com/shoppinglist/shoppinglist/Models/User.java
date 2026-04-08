@@ -4,33 +4,31 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "produits")
-public class Produit {
+@Table(name = "\"Users\"")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
+    @ColumnDefault("'255'")
+    @Column(name = "name", length = Integer.MAX_VALUE)
     private String name;
 
-    @Column(name = "prix", nullable = false, precision = 10, scale = 2)
-    private BigDecimal prix;
+    @ColumnDefault("'255'")
+    @Column(name = "lname", length = Integer.MAX_VALUE)
+    private String lname;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "type_de_course_id", nullable = false)
-    private TypeDeCourse typeDeCourse;
+    @ColumnDefault("'20'")
+    @Column(name = "pseudo", length = Integer.MAX_VALUE)
+    private String pseudo;
 
     @ColumnDefault("now()")
     @Column(name = "created_at", nullable = false)
@@ -39,6 +37,9 @@ public class Produit {
     @ColumnDefault("now()")
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
+    @Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
+    private String email;
 
 
 }
