@@ -1,5 +1,6 @@
 package com.shoppinglist.shoppinglist.Controllers;
 
+import com.shoppinglist.shoppinglist.Models.Produit;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.shoppinglist.shoppinglist.Models.Produit;
 import com.shoppinglist.shoppinglist.Services.ProduitServices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;

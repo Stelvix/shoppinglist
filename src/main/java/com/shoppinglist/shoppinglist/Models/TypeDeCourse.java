@@ -1,34 +1,44 @@
 package com.shoppinglist.shoppinglist.Models;
 
-@lombok.Getter
-@lombok.Setter@jakarta.persistence.Entity
-@jakarta.persistence.Table(name = "type_de_course")
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "type_de_course")
 public class TypeDeCourse {
-@jakarta.persistence.Id
-@jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
-@jakarta.persistence.Column(name = "id", nullable = false)
-private java.util.UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-@jakarta.persistence.Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
-private java.lang.String name;
+    @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
+    private String name;
 
-@jakarta.persistence.Column(name = "description", length = Integer.MAX_VALUE)
-private java.lang.String description;
+    @Column(name = "description", length = Integer.MAX_VALUE)
+    private String description;
 
-@org.hibernate.annotations.ColumnDefault("now()")
-@jakarta.persistence.Column(name = "created_at", nullable = false)
-private java.time.OffsetDateTime createdAt;
+    @ColumnDefault("now()")
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 
-@org.hibernate.annotations.ColumnDefault("now()")
-@jakarta.persistence.Column(name = "updated_at", nullable = false)
-private java.time.OffsetDateTime updatedAt;
+    @ColumnDefault("now()")
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 
-@jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
-@org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.SET_NULL)
-@org.hibernate.annotations.ColumnDefault("gen_random_uuid()")
-@jakarta.persistence.JoinColumn(name = "user_id")
-private com.shoppinglist.shoppinglist.Models.User user;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @ColumnDefault("gen_random_uuid()")
+    @JoinColumn(name = "user_id")
+    private User user;
 
 
 }

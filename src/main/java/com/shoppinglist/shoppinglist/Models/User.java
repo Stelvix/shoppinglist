@@ -1,37 +1,45 @@
 package com.shoppinglist.shoppinglist.Models;
 
-@lombok.Getter
-@lombok.Setter@jakarta.persistence.Entity
-@jakarta.persistence.Table(name = "\"Users\"")
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "\"Users\"")
 public class User {
-@jakarta.persistence.Id
-@jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
-@jakarta.persistence.Column(name = "id", nullable = false)
-private java.util.UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-@org.hibernate.annotations.ColumnDefault("'255'")
-@jakarta.persistence.Column(name = "name", length = Integer.MAX_VALUE)
-private java.lang.String name;
+    @ColumnDefault("'255'")
+    @Column(name = "name", length = Integer.MAX_VALUE)
+    private String name;
 
-@org.hibernate.annotations.ColumnDefault("'255'")
-@jakarta.persistence.Column(name = "lname", length = Integer.MAX_VALUE)
-private java.lang.String lname;
+    @ColumnDefault("'255'")
+    @Column(name = "lname", length = Integer.MAX_VALUE)
+    private String lname;
 
-@org.hibernate.annotations.ColumnDefault("'20'")
-@jakarta.persistence.Column(name = "pseudo", length = Integer.MAX_VALUE)
-private java.lang.String pseudo;
+    @ColumnDefault("'20'")
+    @Column(name = "pseudo", length = Integer.MAX_VALUE)
+    private String pseudo;
 
-@org.hibernate.annotations.ColumnDefault("now()")
-@jakarta.persistence.Column(name = "created_at", nullable = false)
-private java.time.OffsetDateTime createdAt;
+    @ColumnDefault("now()")
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 
-@org.hibernate.annotations.ColumnDefault("now()")
-@jakarta.persistence.Column(name = "updated_at", nullable = false)
-private java.time.OffsetDateTime updatedAt;
+    @ColumnDefault("now()")
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 
-@jakarta.persistence.Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
-private java.lang.String email;
-
+    @Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
+    private String email;
 
 
 }

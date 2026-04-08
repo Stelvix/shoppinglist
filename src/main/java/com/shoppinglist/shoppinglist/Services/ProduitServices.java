@@ -3,11 +3,11 @@ package com.shoppinglist.shoppinglist.Services;
 import java.util.List;
 import java.util.UUID;
 
+import com.shoppinglist.shoppinglist.Models.Produit;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.shoppinglist.shoppinglist.Models.Produit;
 import com.shoppinglist.shoppinglist.Repository.ProduitRepository;
 
 import lombok.RequiredArgsConstructor;

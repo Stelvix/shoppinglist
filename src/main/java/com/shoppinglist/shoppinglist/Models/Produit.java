@@ -1,33 +1,44 @@
 package com.shoppinglist.shoppinglist.Models;
 
-@lombok.Getter
-@lombok.Setter@jakarta.persistence.Entity
-@jakarta.persistence.Table(name = "produits")
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "produits")
 public class Produit {
-@jakarta.persistence.Id
-@jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
-@jakarta.persistence.Column(name = "id", nullable = false)
-private java.util.UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
-@jakarta.persistence.Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
-private java.lang.String name;
+    @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
+    private String name;
 
-@jakarta.persistence.Column(name = "prix", nullable = false, precision = 10, scale = 2)
-private java.math.BigDecimal prix;
+    @Column(name = "prix", nullable = false, precision = 10, scale = 2)
+    private BigDecimal prix;
 
-@jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-@org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.RESTRICT)
-@jakarta.persistence.JoinColumn(name = "type_de_course_id", nullable = false)
-private com.shoppinglist.shoppinglist.Models.TypeDeCourse typeDeCourse;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "type_de_course_id", nullable = false)
+    private TypeDeCourse typeDeCourse;
 
-@org.hibernate.annotations.ColumnDefault("now()")
-@jakarta.persistence.Column(name = "created_at", nullable = false)
-private java.time.OffsetDateTime createdAt;
+    @ColumnDefault("now()")
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 
-@org.hibernate.annotations.ColumnDefault("now()")
-@jakarta.persistence.Column(name = "updated_at", nullable = false)
-private java.time.OffsetDateTime updatedAt;
-
+    @ColumnDefault("now()")
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 
 
 }

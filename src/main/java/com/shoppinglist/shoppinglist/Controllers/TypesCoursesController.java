@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import com.shoppinglist.shoppinglist.Models.TypeDeCourses;
 import com.shoppinglist.shoppinglist.Services.TypeCoursesServices;
+import com.shoppinglist.shoppinglist.Models.TypeDeCourse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +32,8 @@ public class TypesCoursesController {
      */
     @GetMapping
     @Operation(summary = "Récupère tous les types de courses", description = "Retourne une liste de tous les types de courses disponibles")
-    @ApiResponse(responseCode = "200", description = "Liste des types de courses récupérée avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourses.class)))
-    public List<TypeDeCourses> getTypeDeCourses() {
+    @ApiResponse(responseCode = "200", description = "Liste des types de courses récupérée avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class)))
+    public List<TypeDeCourse> getTypeDeCourses() {
         return typeCoursesServices.getAllTypeDeCourses();
     }
 
@@ -43,12 +43,12 @@ public class TypesCoursesController {
     @GetMapping("/{id}")
     @Operation(summary = "Récupère un type de course par ID", description = "Retourne un type de course spécifique basé sur son ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Type de course trouvé", content = @Content(schema = @Schema(implementation = TypeDeCourses.class))),
+            @ApiResponse(responseCode = "200", description = "Type de course trouvé", content = @Content(schema = @Schema(implementation = TypeDeCourse.class))),
             @ApiResponse(responseCode = "404", description = "Type de course non trouvé")
     })
-    public ResponseEntity<TypeDeCourses> getTypeDeCourseById(
+    public ResponseEntity<TypeDeCourse> getTypeDeCourseById(
             @PathVariable @Parameter(description = "ID unique du type de course") UUID id) {
-        TypeDeCourses typeDeCourse = typeCoursesServices.getTypeDeCourseById(id);
+        TypeDeCourse typeDeCourse = typeCoursesServices.getTypeDeCourseById(id);
         return ResponseEntity.ok(typeDeCourse);
     }
 
@@ -58,12 +58,12 @@ public class TypesCoursesController {
     @PostMapping
     @Operation(summary = "Crée un nouveau type de course", description = "Ajoute une nouvelle catégorie de courses à la base de données")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Type de course créé avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourses.class))),
+            @ApiResponse(responseCode = "201", description = "Type de course créé avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class))),
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
-    public ResponseEntity<TypeDeCourses> createTypeDeCourse(
-            @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourses typeDeCourse) {
-        TypeDeCourses savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(typeDeCourse);
+    public ResponseEntity<TypeDeCourse> createTypeDeCourse(
+            @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourse typeDeCourse) {
+        TypeDeCourse savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(typeDeCourse);
 
         URI locationUri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -82,14 +82,14 @@ public class TypesCoursesController {
     @PutMapping("/{id}")
     @Operation(summary = "Met à jour un type de course", description = "Modifie les informations d'un type de course existant")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Type de course mis à jour avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourses.class))),
+            @ApiResponse(responseCode = "200", description = "Type de course mis à jour avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class))),
             @ApiResponse(responseCode = "404", description = "Type de course non trouvé"),
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
-    public ResponseEntity<TypeDeCourses> updateTypeDeCourse(
+    public ResponseEntity<TypeDeCourse> updateTypeDeCourse(
             @PathVariable @Parameter(description = "ID du type de course à mettre à jour") UUID id,
-            @RequestBody @Parameter(description = "Nouvelles données du type de course") TypeDeCourses typeDeCourseDetails) {
-        TypeDeCourses typeDeCourse = typeCoursesServices.updateTypeDeCourse(id, typeDeCourseDetails);
+            @RequestBody @Parameter(description = "Nouvelles données du type de course") TypeDeCourse typeDeCourseDetails) {
+        TypeDeCourse typeDeCourse = typeCoursesServices.updateTypeDeCourse(id, typeDeCourseDetails);
         return ResponseEntity.ok(typeDeCourse);
     }
 
