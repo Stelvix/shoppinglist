@@ -2,23 +2,24 @@ package com.shoppinglist.shoppinglist.Models;
 
 @lombok.Getter
 @lombok.Setter@jakarta.persistence.Entity
-@jakarta.persistence.Table(name = "produits")
-public class Produit {
+@jakarta.persistence.Table(name = "\"Users\"")
+public class User {
 @jakarta.persistence.Id
 @jakarta.persistence.GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
 @jakarta.persistence.Column(name = "id", nullable = false)
 private java.util.UUID id;
 
-@jakarta.persistence.Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
+@org.hibernate.annotations.ColumnDefault("'255'")
+@jakarta.persistence.Column(name = "name", length = Integer.MAX_VALUE)
 private java.lang.String name;
 
-@jakarta.persistence.Column(name = "prix", nullable = false, precision = 10, scale = 2)
-private java.math.BigDecimal prix;
+@org.hibernate.annotations.ColumnDefault("'255'")
+@jakarta.persistence.Column(name = "lname", length = Integer.MAX_VALUE)
+private java.lang.String lname;
 
-@jakarta.persistence.ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
-@org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.RESTRICT)
-@jakarta.persistence.JoinColumn(name = "type_de_course_id", nullable = false)
-private com.shoppinglist.shoppinglist.Models.TypeDeCourse typeDeCourse;
+@org.hibernate.annotations.ColumnDefault("'20'")
+@jakarta.persistence.Column(name = "pseudo", length = Integer.MAX_VALUE)
+private java.lang.String pseudo;
 
 @org.hibernate.annotations.ColumnDefault("now()")
 @jakarta.persistence.Column(name = "created_at", nullable = false)
@@ -27,6 +28,9 @@ private java.time.OffsetDateTime createdAt;
 @org.hibernate.annotations.ColumnDefault("now()")
 @jakarta.persistence.Column(name = "updated_at", nullable = false)
 private java.time.OffsetDateTime updatedAt;
+
+@jakarta.persistence.Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
+private java.lang.String email;
 
 
 
