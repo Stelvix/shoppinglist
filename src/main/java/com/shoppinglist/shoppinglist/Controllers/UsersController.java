@@ -71,18 +71,19 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
     public ResponseEntity<UserResponseDTO> createUser(
-            @RequestBody @Parameter(description = "Données de l'utilisateur à créer") UserCreateDTO userCreateDTO) {
-        UserResponseDTO savedUser = usersServices.createUser(userCreateDTO);
+                    @RequestBody @Parameter(description = "Données de l'utilisateur à créer") UserCreateDTO userCreateDTO) {
+            UserResponseDTO savedUser = usersServices.createUser(userCreateDTO);
 
-        URI locationUri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedUser.getId())
-                .toUri();
+            URI locationUri = ServletUriComponentsBuilder
+                            .fromCurrentRequest()
+                            .path("/{id}")
+                            .buildAndExpand(savedUser.getId())
+                            .toUri();
 
-        return ResponseEntity
-                .created(locationUri)
-                .body(savedUser);
+            return ResponseEntity
+                            .created(locationUri)
+                            .body(savedUser);
+
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.shoppinglist.shoppinglist.Controllers;
 
 import com.shoppinglist.shoppinglist.Models.Produit;
+import com.shoppinglist.shoppinglist.Dtos.ProduitCreateDTO;
+import com.shoppinglist.shoppinglist.Dtos.ProduitResponseDTO;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,86 +35,89 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Tag(name = "Produits", description = "Gestion des produits de shopping")
 public class ProduitsController {
 
-    private final ProduitServices produitServices;
+        private final ProduitServices produitServices;
 
-    /**
-     * GET /api/produits - Récupère tous les produits
-     */
-    @GetMapping
-    @Operation(summary = "Récupère tous les produits", description = "Retourne une liste de tous les produits enregistrés")
-    @ApiResponse(responseCode = "200", description = "Liste des produits récupérée avec succès", content = @Content(schema = @Schema(implementation = Produit.class)))
-    public List<Produit> getProduits() {
-        return produitServices.getAllProduits();
-    }
+        /**
+         * GET /api/produits - Récupère tous les produits
+         */
+        @GetMapping
+        @Operation(summary = "Récupère tous les produits", description = "Retourne une liste de tous les produits enregistrés")
+        @ApiResponse(responseCode = "200", description = "Liste des produits récupérée avec succès", content = @Content(schema = @Schema(implementation = Produit.class)))
+        public List<ProduitResponseDTO> getProduits() {
+                return produitServices.getAllProduits();
+        }
 
-    /**
-     * GET /api/produits/{id} - Récupère un produit par ID
-     */
-    @GetMapping("/{id}")
-    @Operation(summary = "Récupère un produit par ID", description = "Retourne un produit spécifique basé sur son ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Produit trouvé", content = @Content(schema = @Schema(implementation = Produit.class))),
-            @ApiResponse(responseCode = "404", description = "Produit non trouvé")
-    })
-    public ResponseEntity<Produit> getProduitById(
-            @PathVariable @Parameter(description = "ID unique du produit") UUID id) {
-        Produit produit = produitServices.getProduitsById(id);
-        return ResponseEntity.ok(produit);
-    }
+        /**
+         * GET /api/produits/{id} - Récupère un produit par ID
+         */
+        @GetMapping("/{id}")
+        @Operation(summary = "Récupère un produit par ID", description = "Retourne un produit spécifique basé sur son ID")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Produit trouvé", content = @Content(schema = @Schema(implementation = Produit.class))),
+                        @ApiResponse(responseCode = "404", description = "Produit non trouvé")
+        })
+        public ResponseEntity<ProduitResponseDTO> getProduitById(
+                        @PathVariable @Parameter(description = "ID unique du produit") UUID id) {
+                ProduitResponseDTO produitDto = produitServices.getProduitsById(id);
+                return ResponseEntity.ok(produitDto);
+        }
 
-    /**
-     * POST /api/produits - Crée un nouveau produit
-     */
-    @PostMapping
-    @Operation(summary = "Crée un nouveau produit", description = "Ajoute un nouveau produit à la base de données")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Produit créé avec succès", content = @Content(schema = @Schema(implementation = Produit.class))),
-            @ApiResponse(responseCode = "400", description = "Données invalides")
-    })
-    public ResponseEntity<Produit> createProduit(
-            @RequestBody @Parameter(description = "Données du produit à créer") Produit produit) {
-        Produit savedProduit = produitServices.CreateProduits(produit);
+        /**
+         * POST /api/produits - Crée un nouveau produit
+         */
+        @PostMapping("/produit/{typeDeCourseId}")
+        @Operation(summary = "Crée un nouveau produit", description = "Ajoute un nouveau produit à la base de données")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "201", description = "Produit créé avec succès", content = @Content(schema = @Schema(implementation = Produit.class))),
+                        @ApiResponse(responseCode = "400", description = "Données invalides")
+        })
+        public ResponseEntity<ProduitResponseDTO> createProduit(
+                        @PathVariable UUID typeDeCourseId,
+                        @RequestBody ProduitCreateDTO produitCreateDTO,
+                        @Parameter(description = "Données du produit à créer") ProduitCreateDTO produit) {
 
-        URI locationUri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedProduit.getId())
-                .toUri();
+                ProduitResponseDTO savedProduit = produitServices.CreateProduits(typeDeCourseId, produitCreateDTO);
 
-        return ResponseEntity
-                .created(locationUri)
-                .body(savedProduit);
-    }
+                URI locationUri = ServletUriComponentsBuilder
+                                .fromCurrentRequest()
+                                .path("/{id}")
+                                .buildAndExpand(savedProduit.getId())
+                                .toUri();
 
-    /**
-     * PUT /api/produits/{id} - Met à jour un produit existant
-     */
-    @PutMapping("/{id}")
-    @Operation(summary = "Met à jour un produit", description = "Modifie les informations d'un produit existant")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Produit mis à jour avec succès", content = @Content(schema = @Schema(implementation = Produit.class))),
-            @ApiResponse(responseCode = "404", description = "Produit non trouvé"),
-            @ApiResponse(responseCode = "400", description = "Données invalides")
-    })
-    public ResponseEntity<Produit> updateProduit(
-            @PathVariable @Parameter(description = "ID du produit à mettre à jour") UUID id,
-            @RequestBody @Parameter(description = "Nouvelles données du produit") Produit produitDetails) {
-        Produit produit = produitServices.updateProduit(produitDetails, id);
-        return ResponseEntity.ok(produit);
-    }
+                return ResponseEntity
+                                .created(locationUri)
+                                .body(savedProduit);
+        }
 
-    /**
-     * DELETE /api/produits/{id} - Supprime un produit
-     */
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Supprime un produit", description = "Retire un produit de la base de données")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Produit supprimé avec succès"),
-            @ApiResponse(responseCode = "404", description = "Produit non trouvé")
-    })
-    public ResponseEntity<Void> deleteProduit(
-            @PathVariable @Parameter(description = "ID du produit à supprimer") UUID id) {
-        produitServices.deleteProduitById(id);
-        return ResponseEntity.noContent().build();
-    }
+        /**
+         * PUT /api/produits/{id} - Met à jour un produit existant
+         */
+        @PutMapping("/{id}")
+        @Operation(summary = "Met à jour un produit", description = "Modifie les informations d'un produit existant")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Produit mis à jour avec succès", content = @Content(schema = @Schema(implementation = Produit.class))),
+                        @ApiResponse(responseCode = "404", description = "Produit non trouvé"),
+                        @ApiResponse(responseCode = "400", description = "Données invalides")
+        })
+        public ResponseEntity<ProduitResponseDTO> updateProduit(
+                        @PathVariable @Parameter(description = "ID du produit à mettre à jour") UUID id,
+                        @RequestBody @Parameter(description = "Nouvelles données du produit") ProduitCreateDTO produitDetails) {
+                ProduitResponseDTO updateproduit = produitServices.updateProduit(produitDetails, id);
+                return ResponseEntity.ok(updateproduit);
+        }
+
+        /**
+         * DELETE /api/produits/{id} - Supprime un produit
+         */
+        @DeleteMapping("/{id}")
+        @Operation(summary = "Supprime un produit", description = "Retire un produit de la base de données")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "204", description = "Produit supprimé avec succès"),
+                        @ApiResponse(responseCode = "404", description = "Produit non trouvé")
+        })
+        public ResponseEntity<Void> deleteProduit(
+                        @PathVariable @Parameter(description = "ID du produit à supprimer") UUID id) {
+                produitServices.deleteProduitById(id);
+                return ResponseEntity.noContent().build();
+        }
 }

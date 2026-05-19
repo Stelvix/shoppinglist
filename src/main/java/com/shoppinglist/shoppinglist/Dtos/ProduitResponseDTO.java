@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.UUID;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -15,5 +16,6 @@ public class ProduitResponseDTO {
     private UUID id;
     private String name;
     private BigDecimal prix;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
 }
-

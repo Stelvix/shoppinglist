@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### LE FICHIER ENV de configuration : applications properties ###
+src/main/resources/application.properties
