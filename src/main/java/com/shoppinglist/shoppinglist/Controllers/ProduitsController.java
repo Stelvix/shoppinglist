@@ -68,22 +68,18 @@ public class ProduitsController {
         @PostMapping("/produit/{typeDeCourseId}")
         @Operation(summary = "Crée un nouveau produit", description = "Ajoute un nouveau produit à la base de données")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "201", description = "Produit créé avec succès", content = @Content(schema = @Schema(implementation = Produit.class))),
+                        @ApiResponse(responseCode = "201", description = "Produit créé avec succès", content = @Content(schema = @Schema(implementation = ProduitResponseDTO.class))),
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
         public ResponseEntity<ProduitResponseDTO> createProduit(
                         @PathVariable UUID typeDeCourseId,
-                        @RequestBody ProduitCreateDTO produitCreateDTO,
-                        @Parameter(description = "Données du produit à créer") ProduitCreateDTO produit) {
-
+                        @RequestBody @Parameter(description = "Données du produit à créer") ProduitCreateDTO produitCreateDTO) {
                 ProduitResponseDTO savedProduit = produitServices.CreateProduits(typeDeCourseId, produitCreateDTO);
-
                 URI locationUri = ServletUriComponentsBuilder
                                 .fromCurrentRequest()
                                 .path("/{id}")
                                 .buildAndExpand(savedProduit.getId())
                                 .toUri();
-
                 return ResponseEntity
                                 .created(locationUri)
                                 .body(savedProduit);
