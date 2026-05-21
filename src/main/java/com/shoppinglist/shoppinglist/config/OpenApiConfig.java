@@ -13,18 +13,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("ShoppingList API")
-                        .version("1.0.0")
-                        .description("API REST pour la gestion d'une liste de courses avec types de courses")
-                        .contact(new Contact()
-                                .name("ShoppingList Team")
-                                .email("support@shoppinglist.com"))
-                        .license(new License()
-                                .name("MIT")
-                                .url("https://opensource.org/licenses/MIT")));
-    }
+        @Bean
+        public OpenAPI customOpenAPI() {
+                return new OpenAPI()
+                                .info(new Info()
+                                                .title("ShoppingList API")
+                                                .version("1.0.0")
+                                                .description("API REST pour la gestion d'une liste de courses avec types de courses")
+                                                .contact(new Contact()
+                                                                .name("ShoppingList Team")
+                                                                .email("hounkpesagbojeff@gmail.com"))
+                                                .license(new License()
+                                                                .name("MIT")
+                                                                .url("https://opensource.org/licenses/MIT")));
+        }
 }
