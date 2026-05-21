@@ -84,6 +84,7 @@ public class UsersServices {
                 user.getLname(),
                 user.getPseudo(),
                 user.getEmail(),
+                user.getPassword(),
                 user.getCreatedAt(),
                 user.getUpdatedAt());
     }
