@@ -1,14 +1,17 @@
-# utiliser l'image de base de java 25
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+COPY . .
+
+RUN mvn clean package -DskipTests
+
 FROM eclipse-temurin:21-jre-jammy
 
-# Je définis le dossier de travail dans le container
 WORKDIR /shoppinglistApp
 
-# Copy du fichier jar compilé
-COPY target/shoppinglist-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
-# Exposer le port
 EXPOSE 8080
 
-# commande pour lancer l'application
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+ENTRYPOINT ["java", "-jar", "app.jar"]
