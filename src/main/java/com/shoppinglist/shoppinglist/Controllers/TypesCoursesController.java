@@ -57,15 +57,17 @@ public class TypesCoursesController {
         /**
          * POST /api/type_de_courses - Crée un nouveau type de course
          */
-        @PostMapping
+        @PostMapping("typedecourses/{userId}")
         @Operation(summary = "Crée un nouveau type de course", description = "Ajoute une nouvelle catégorie de courses à la base de données")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "201", description = "Type de course créé avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class))),
+                        @ApiResponse(responseCode = "201", description = "Type de course créé avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourseResponseDTO.class))),
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
         public ResponseEntity<TypeDeCourseResponseDTO> createTypeDeCourse(
+                        @PathVariable UUID userId,
                         @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto) {
-                TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(typeDeCourseDto);
+                TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(userId,
+                                typeDeCourseDto);
 
                 URI locationUri = ServletUriComponentsBuilder
                                 .fromCurrentRequest()

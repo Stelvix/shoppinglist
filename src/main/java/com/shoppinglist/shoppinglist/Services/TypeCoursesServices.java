@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.shoppinglist.shoppinglist.Repository.TypesCoursesRepository;
+import com.shoppinglist.shoppinglist.Repository.UsersRepository;
 import com.shoppinglist.shoppinglist.Models.TypeDeCourse;
+import com.shoppinglist.shoppinglist.Models.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TypeCoursesServices {
     private final TypesCoursesRepository typesCoursesRepository;
+    private final UsersRepository userRepository;
 
     /**
      * Récupère tous les types de courses
@@ -44,12 +47,17 @@ public class TypeCoursesServices {
     /**
      * Crée un nouveau type de course
      */
-    public TypeDeCourseResponseDTO createTypeDeCourse(TypeDeCourseCreateDTO typeDeCourseDto) {
+    public TypeDeCourseResponseDTO createTypeDeCourse(UUID UserId, TypeDeCourseCreateDTO typeDeCourseDto) {
+        // je reherde d'abord le user
+        User user = userRepository.findById(UserId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
         TypeDeCourse typeDeCourse = new TypeDeCourse();
 
         typeDeCourse.setName(typeDeCourseDto.getName());
         typeDeCourse.setDescription(typeDeCourseDto.getDescription());
         typeDeCourse.setCreatedAt(OffsetDateTime.now());
+        typeDeCourse.setUser(user);
 
         // flush
 
