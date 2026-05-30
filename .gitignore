@@ -34,3 +34,7 @@ build/
 
 ### LE FICHIER ENV de configuration : applications properties ###
 src/main/resources/application.properties
+
+### fichier ps1 et dockerignore
+deploy.ps1
+.dockerignore

@@ -1,5 +1,5 @@
 # utiliser l'image de base de java 25
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-jammy
 
 # Je définis le dossier de travail dans le container
 WORKDIR /shoppinglistApp
