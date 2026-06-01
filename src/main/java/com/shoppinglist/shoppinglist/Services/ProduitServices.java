@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import com.shoppinglist.shoppinglist.Dtos.GetTypeCourse;
 import com.shoppinglist.shoppinglist.Dtos.ProduitCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.ProduitResponseDTO;
 import com.shoppinglist.shoppinglist.Models.Produit;
@@ -86,12 +87,22 @@ public class ProduitServices {
 
     // Mapping du DTO
     private ProduitResponseDTO convertToResponseDTO(Produit produit) {
+        GetTypeCourse dtoTypeCourse = null;
+
+        if (produit.getTypeDeCourse() != null) {
+            dtoTypeCourse = new GetTypeCourse(
+                    produit.getTypeDeCourse().getId(),
+                    produit.getTypeDeCourse().getName());
+        }
+
         return new ProduitResponseDTO(
                 produit.getId(),
                 produit.getName(),
                 produit.getPrix(),
                 produit.getCreatedAt(),
-                produit.getUpdatedAt());
+                produit.getUpdatedAt(),
+                dtoTypeCourse);
+
     }
 
 }
