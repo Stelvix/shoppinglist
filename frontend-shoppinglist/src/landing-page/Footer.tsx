@@ -1,16 +1,21 @@
-import React from 'react'
+import { AiOutlineShoppingCart } from 'react-icons/ai'
 
-export default function LandingFooter(){
+export default function Footer() {
   return (
-    <footer className="py-6 bg-white border-t">
-      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between text-sm text-textSecondary">
+    <footer className="border-t border-slate-200 bg-white py-8">
+      <div className="section-shell flex flex-col gap-4 text-sm text-textSecondary sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-white font-bold">SL</div>
-          <div>© Shopping List</div>
+          <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary text-white">
+            <AiOutlineShoppingCart className="h-4.5 w-4.5" />
+          </span>
+          <span className="font-semibold text-textPrimary">Shopping List</span>
         </div>
-        <div className="flex gap-4">
-          <a>Mentions légales</a>
-          <a>Politique de confidentialité</a>
+
+
+        <div className="flex gap-5">
+          <a href="#" className="transition hover:text-textPrimary">Mentions legales</a>
+          <a href="#" className="transition hover:text-textPrimary">Confidentialite</a>
+          <a href="#" className="transition hover:text-textPrimary">Contact</a>
         </div>
       </div>
     </footer>
