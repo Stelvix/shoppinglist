@@ -12,13 +12,7 @@ import {
   AiOutlineArrowLeft,
 } from 'react-icons/ai'
 
-type SignupFormValues = {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  confirmPassword: string
-}
+import type { SignupFormValues } from '../types'
 
 const benefits = [
   {

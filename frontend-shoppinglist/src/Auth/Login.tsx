@@ -3,12 +3,10 @@ import { AuthField, Brand } from './AuthIcons'
 import { Link } from 'react-router-dom'
 import { AiOutlineMail, AiOutlineLock } from 'react-icons/ai'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
+import authService from '../Services/auth'
 
-type LoginFormValues = {
-  email: string
-  password: string
-  remember: boolean
-}
+
+import type { LoginFormValues } from '../types'
 
 export default function Login() {
   const {
@@ -23,8 +21,16 @@ export default function Login() {
     },
   })
 
-  const onSubmit = (values: LoginFormValues) => {
-    console.log('login', values)
+  const onSubmit = async (values: LoginFormValues) => {
+    try {
+
+      const resp = await authService.login(values);
+      console.log("Succes : ", resp)
+
+      
+    } catch (error) {
+      console.log("Erreur : ", error)
+    }
   }
 
   return (
