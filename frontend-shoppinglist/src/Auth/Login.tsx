@@ -1,14 +1,18 @@
 import { useForm } from 'react-hook-form'
 import { AuthField, Brand } from './AuthIcons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AiOutlineMail, AiOutlineLock } from 'react-icons/ai'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 import authService from '../Services/auth'
 
+import Toast from '../Composables/Toast'
+
 
 import type { LoginFormValues } from '../types'
+import { useState } from 'react'
 
 export default function Login() {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -21,15 +25,36 @@ export default function Login() {
     },
   })
 
+  const [toast, setToast] = useState <{
+  message: string;
+  type: "error" | "success" | "info";
+} |null>(null)
+
   const onSubmit = async (values: LoginFormValues) => {
     try {
 
       const resp = await authService.login(values);
       console.log("Succes : ", resp)
+      setToast({
+        message: "Connexion réussie, vous serais rediriger!",
+        type:'success'
+      });
+      setTimeout(() => {
+        setToast(null);
+      }, 3000)
+      navigate('/dashboard')
 
       
-    } catch (error) {
+    } catch (error:any) {
       console.log("Erreur : ", error)
+      setToast({
+        message: error?.response?.data?.message ?? error?.message ?? " Erreur de connexion",
+        type: "error"
+      });
+
+      setTimeout(() => {
+        setToast(null);
+      }, 3000)
     }
   }
 
@@ -47,6 +72,9 @@ export default function Login() {
               Retrouvez vos listes et continuez a suivre vos depenses.
             </p>
 
+            {toast && (
+              <Toast message={toast.message} type={toast.type} />
+            )}
             <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
               <AuthField
                 label="Adresse e-mail"
@@ -61,6 +89,7 @@ export default function Login() {
                   },
                 })}
                 error={errors.email}
+            
               />
               <AuthField
                 label="Mot de passe"

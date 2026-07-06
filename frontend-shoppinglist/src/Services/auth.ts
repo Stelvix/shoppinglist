@@ -1,6 +1,7 @@
 import api from './axios';
 import type { LoginFormValues, SignupFormValues, User } from '../types';
 
+
 /**
  * Fonction utilitaire pour décoder un JWT sans bibliothèque externe.
  */
@@ -32,9 +33,11 @@ export const authService = {
     });
     
     const token = response.data;
-    if (token) {
-      localStorage.setItem('token', token);
+  
+    if (!token) {
+      throw new Error("Token manquant dans la réponse serveur");
     }
+    localStorage.setItem('token', token)
     
     return token;
   },
