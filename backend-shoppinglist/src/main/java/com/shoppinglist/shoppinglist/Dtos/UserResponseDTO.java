@@ -17,7 +17,5 @@ public class UserResponseDTO {
     private String lname;
     private String pseudo;
     private String email;
-    private String password;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+
 }

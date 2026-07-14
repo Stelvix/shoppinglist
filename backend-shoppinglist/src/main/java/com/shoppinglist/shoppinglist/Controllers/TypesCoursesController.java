@@ -112,4 +112,13 @@ public class TypesCoursesController {
                 typeCoursesServices.deleteTypeDeCourseById(id);
                 return ResponseEntity.noContent().build();
         }
+
+        /**
+         * ENDPOINT SPECIAL POUR RENVOYER LES LISTES DE COURSES EN FONCTION DU USER
+         */
+        @GetMapping("/user/{userId}")
+        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(@PathVariable UUID userId) {
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByuserId(userId);
+                return ResponseEntity.ok(types);
+        }
 }
