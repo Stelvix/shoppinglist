@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import authService from "../Services/auth";
 import type { User } from "../types";
 import DashboardLayout from "./DashboardLayout";
+import { AiOutlineShoppingCart } from "react-icons/ai";
+import typeDeCourseService from "../Services/Typesdecourses";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -32,6 +34,10 @@ const Dashboard = () => {
     fetchUser();
   }, [navigate]);
 
+  useEffect(() => {
+  typeDeCourseService.getTypeDecoursesByuserId();
+}, []);
+
   if (loading) {
     return <div className="text-center p-4">Chargement du profil...</div>;
   }
@@ -39,12 +45,25 @@ const Dashboard = () => {
   return (
     <DashboardLayout userName={user?.pseudo ?? 'Invité'}>
       <div className="grid gap-6">
-        <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
+        <div className=" grid gap-2 lg:grid-cols-2">
+          <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
+            <div className="flex items-center">
+               <AiOutlineShoppingCart className="text-2xl mr-2 text-blue-600 font-medium" />
+          <h2 className="text-xl font-black">Aperçu rapide</h2>
+           </div>
+          <p className="mt-3 text-sm leading-6 text-textSecondary">
+            Ici, tu pourras afficher les statistiques principales, les listes récentes et les actions rapides.
+          </p>
+        </div>
+
+                <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
           <h2 className="text-xl font-black">Aperçu rapide</h2>
           <p className="mt-3 text-sm leading-6 text-textSecondary">
             Ici, tu pourras afficher les statistiques principales, les listes récentes et les actions rapides.
           </p>
         </div>
+        </div>
+   
 
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
