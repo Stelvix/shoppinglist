@@ -109,7 +109,6 @@ public class TypeCoursesServices {
                 typeDeCourse.getName(),
                 typeDeCourse.getDescription(),
                 typeDeCourse.getCreatedAt(),
-                typeDeCourse.getUpdatedAt(),
-                typeDeCourse.getUsers());
+                typeDeCourse.getUpdatedAt());
     }
 }
