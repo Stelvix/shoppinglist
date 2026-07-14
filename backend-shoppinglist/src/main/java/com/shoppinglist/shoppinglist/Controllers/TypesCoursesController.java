@@ -151,4 +151,5 @@ public class TypesCoursesController {
                 return ResponseEntity.ok(types);
 
         }
+        // test de déploiement
 }
