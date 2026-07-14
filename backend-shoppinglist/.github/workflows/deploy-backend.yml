@@ -1,0 +1,40 @@
+name: Buil and Deploy Spring Boot to Azure
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'backend-shoppinglist/**'
+env:
+    AZURE_WEBAPP_NAME: 'MyShoppintListapi'
+    WORKING_DIRECTORY: 'backend-shoppinglist'
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            # recupe du code du repo git
+            - name: Checkout Github Actions
+              uses: actions/checkout@v4
+
+            #installation de java 21 sur la vm 
+            - name: Set up Java 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: '21'
+                  distribution: 'temurin'
+                  cache: 'maven'
+
+            # compilation
+            - name: Build with Maven
+              run: mvn clean package -Dskiptests
+              working-directory: ${{env.WORKING_DIRECTORY}}
+            
+            # Envoie du fichier .jar sur Azure
+            - name: Deploy to Azure Web App
+              uses: azure/webapps-deploy@v3
+              with:
+                  app-name: ${{env.AZURE_WEBAPP_NAME}}
+                  publish-profile: '${{env.WORKING_DIRECTORY}}/target/*.jar'
