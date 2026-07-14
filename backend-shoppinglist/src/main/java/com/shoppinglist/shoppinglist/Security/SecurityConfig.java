@@ -85,7 +85,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
                     @Value("${app.cors.allowed-origins}") List<String> allowedOrigins) { 
-
             CorsConfiguration configuration = new CorsConfiguration();
 
             // Spring fait le découpage tout seul, on lui passe directement la liste !
