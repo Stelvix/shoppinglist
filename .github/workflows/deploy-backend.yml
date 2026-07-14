@@ -3,7 +3,7 @@ name: Buil and Deploy Spring Boot to Azure
 on:
     push:
         branches:
-            - main
+            - master
         paths:
             - 'backend-shoppinglist/**'
 env:
