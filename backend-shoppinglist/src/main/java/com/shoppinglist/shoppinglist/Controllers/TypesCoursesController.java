@@ -1,5 +1,6 @@
 package com.shoppinglist.shoppinglist.Controllers;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -19,6 +20,9 @@ import com.shoppinglist.shoppinglist.Models.TypeDeCourse;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
+import java.sql.Date;
+import java.time.DateTimeException;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -120,5 +124,31 @@ public class TypesCoursesController {
         public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(@PathVariable UUID userId) {
                 List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByuserId(userId);
                 return ResponseEntity.ok(types);
+        }
+
+        /**
+         * ENDPOINT SPECIAL POUR RENVOYER LES LISTES DE COURSES EN FONCTION D'une date
+         * spécifique
+         */
+        @GetMapping("/typeDeCourse/{date}")
+        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByDate(
+                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date) {
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesBySpecifiedDate(date);
+                return ResponseEntity.ok(types);
+        }
+
+        /**
+         * ENDPOINT DÉDIÉ : Renvoie toutes les listes créées durant la journée de la
+         * date fournie
+         * Exemple : GET /api/types-courses/by-day/2026-07-14T15:30:00Z
+         */
+        @GetMapping("/by-day/{date}")
+        @ApiResponse(responseCode = "200", description = "Type de courses récupéré avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class)))
+        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCoursesByDay(
+                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date) {
+
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesByDay(date);
+                return ResponseEntity.ok(types);
+
         }
 }

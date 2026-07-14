@@ -10,4 +10,8 @@ public interface TypesCoursesRepository extends JpaRepository<TypeDeCourse, UUID
 
     List<TypeDeCourse> findByUserId(UUID id);
 
+    List<TypeDeCourse> findByCreatedAt(java.time.OffsetDateTime createdAt);
+
+    List<TypeDeCourse> findByCreatedAtBetween(java.time.OffsetDateTime start, java.time.OffsetDateTime end);
+
 }

@@ -1,7 +1,7 @@
 export interface User {
   id: string;
-  name: string;      // Prénom dans la base de données (correspond à firstName)
-  lname: string;     // Nom dans la base de données (correspond à lastName)
+  name: string;      
+  lname: string;     
   pseudo: string;
   email: string;
   createdAt?: string;

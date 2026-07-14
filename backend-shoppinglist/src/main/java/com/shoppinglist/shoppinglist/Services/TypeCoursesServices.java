@@ -1,6 +1,10 @@
 package com.shoppinglist.shoppinglist.Services;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -102,6 +106,46 @@ public class TypeCoursesServices {
                 .toList(); // pour chaques type de courses on les map en DTO
     }
 
+    // récupérer une liste de type de courses en fontion d'une date précise
+    public List<TypeDeCourseResponseDTO> getTypeDeCoursesBySpecifiedDate(OffsetDateTime date) {
+        List<TypeDeCourse> types = typesCoursesRepository.findByCreatedAt(date);
+
+        return types
+                .stream()
+                .map(this::convertTCourseResponseDTO)
+                .toList();
+    }
+
+    // get les types de courses par jour
+    public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(OffsetDateTime dateTime) {
+        try {
+            // 1. On extrait la date pure
+            LocalDate localDate = dateTime.toLocalDate();
+
+            // 2. Début de journée (00:00:00)
+            OffsetDateTime startOfDay = localDate.atStartOfDay().atOffset(ZoneOffset.UTC);
+
+            // 3. Fin de journée (23:59:59.999)
+            OffsetDateTime endOfDay = localDate.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
+
+            // 4. Requête SQL automatique "BETWEEN"
+            List<TypeDeCourse> types = typesCoursesRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+
+            return types.stream()
+                    .map(this::convertTCourseResponseDTO)
+                    .toList();
+
+        } catch (Exception e) {
+
+            System.err.println("Erreur lors de la récupération des types de courses par jour : " + e.getMessage());
+            
+
+            // On retourne une liste vide pour éviter de casser l'application et de renvoyer
+            // un null
+            return List.of();
+        }
+    }
+
     // Mapping du DTO
     private TypeDeCourseResponseDTO convertTCourseResponseDTO(TypeDeCourse typeDeCourse) {
         return new TypeDeCourseResponseDTO(
@@ -109,7 +153,6 @@ public class TypeCoursesServices {
                 typeDeCourse.getName(),
                 typeDeCourse.getDescription(),
                 typeDeCourse.getCreatedAt(),
-                typeDeCourse.getUpdatedAt(),
-                typeDeCourse.getUsers());
+                typeDeCourse.getUpdatedAt());
     }
 }
