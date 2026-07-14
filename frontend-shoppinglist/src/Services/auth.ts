@@ -16,7 +16,7 @@ function parseJwt(token: string) {
         .join('')
     );
     return JSON.parse(jsonPayload);
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -83,14 +83,17 @@ export const authService = {
     try {
       const response = await api.get<User>('/users/me');
       return response.data;
-    } catch (error: any) {
-      const status = error?.response?.status;
+    } catch (error: unknown) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
       if (status === 401 || status === 403) {
-        throw new Error('Utilisateur connecté introuvable. Veuillez vous reconnecter.');
+        if (!this.isAuthenticated()) {
+          throw new Error('Utilisateur connecté introuvable. Veuillez vous reconnecter.', { cause: error });
+        }
+        throw new Error('Problème d’authentification. Veuillez réessayer ou vous reconnecter.', { cause: error });
       }
 
       console.error('Erreur lors de la récupération de l’utilisateur connecté', error);
-      throw new Error('Impossible de charger le profil utilisateur. Vérifiez votre connexion.');
+      throw new Error('Impossible de charger le profil utilisateur. Vérifiez votre connexion.', { cause: error });
     }
   },
 
