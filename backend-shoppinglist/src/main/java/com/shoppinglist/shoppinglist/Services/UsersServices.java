@@ -76,6 +76,21 @@ public class UsersServices {
         usersRepository.deleteById(id);
     }
 
+    // SEARCH USER BY EMAIL
+    public User isThisUserExist(User users) {
+        return usersRepository.findByEmail(users.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur inexistant !"));
+    }
+
+    // Récupère l'utilisateur par email et le convertit en DTO
+    public UserResponseDTO getUserByEmail(String email) {
+        User user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+        return convertToResponseDTO(user);
+    }
+
+
+
     // Mapping du DTO: Conversion des entités en DTO
     private UserResponseDTO convertToResponseDTO(User user) {
         return new UserResponseDTO(
@@ -83,9 +98,6 @@ public class UsersServices {
                 user.getName(),
                 user.getLname(),
                 user.getPseudo(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getCreatedAt(),
-                user.getUpdatedAt());
+                user.getEmail());
     }
 }

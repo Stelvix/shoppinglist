@@ -92,6 +92,16 @@ public class TypeCoursesServices {
         typesCoursesRepository.deleteById(id);
     }
 
+    // service spécial
+    // Récuperer une liste de courses en fonction d'un utilisateur
+    public List<TypeDeCourseResponseDTO> getTypeDeCourseByuserId(UUID id) {
+        List<TypeDeCourse> types = typesCoursesRepository.findByUserId(id);
+        return types
+                .stream()
+                .map(this::convertTCourseResponseDTO)
+                .toList(); // pour chaques type de courses on les map en DTO
+    }
+
     // Mapping du DTO
     private TypeDeCourseResponseDTO convertTCourseResponseDTO(TypeDeCourse typeDeCourse) {
         return new TypeDeCourseResponseDTO(
@@ -99,6 +109,7 @@ public class TypeCoursesServices {
                 typeDeCourse.getName(),
                 typeDeCourse.getDescription(),
                 typeDeCourse.getCreatedAt(),
-                typeDeCourse.getUpdatedAt());
+                typeDeCourse.getUpdatedAt(),
+                typeDeCourse.getUsers());
     }
 }
