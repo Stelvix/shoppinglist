@@ -31,6 +31,10 @@ jobs:
             - name: Build with Maven
               run: mvn clean package -Dskiptests
               working-directory: ${{env.WORKING_DIRECTORY}}
+              env:
+                SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
+                SPRING_DATASOURCE_USERNAME: sa
+                SPRING_DATASOURCE_PASSWORD: ""
             
             # Envoie du fichier .jar sur Azure
             - name: Deploy to Azure Web App
