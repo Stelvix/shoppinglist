@@ -1,7 +1,6 @@
 import api from './axios';
 import type { LoginFormValues, SignupFormValues, User } from '../types';
 
-
 /**
  * Fonction utilitaire pour décoder un JWT sans bibliothèque externe.
  */
@@ -22,6 +21,19 @@ function parseJwt(token: string) {
   }
 }
 
+function isTokenValid(token: string | null): boolean {
+  if (!token) {
+    return false;
+  }
+
+  const payload = parseJwt(token);
+  if (!payload || typeof payload !== 'object' || typeof payload.exp !== 'number') {
+    return false;
+  }
+
+  return Math.floor(Date.now() / 1000) < payload.exp;
+}
+
 export const authService = {
   /**
    * Connexion de l'utilisateur. Le backend retourne directement le token JWT sous forme de chaîne de caractères.
@@ -31,14 +43,15 @@ export const authService = {
       email: credentials.email,
       password: credentials.password
     });
-    
+
     const token = response.data;
-  
+
     if (!token) {
-      throw new Error("Token manquant dans la réponse serveur");
+      throw new Error('Token manquant dans la réponse serveur');
     }
-    localStorage.setItem('token', token)
-    
+
+    localStorage.setItem('token', token);
+
     return token;
   },
 
@@ -59,23 +72,26 @@ export const authService = {
   },
 
   /**
-   * Récupère les détails de l'utilisateur connecté en décodant l'email du token 
-   * et en recherchant l'utilisateur correspondant dans l'API.
+   * Récupère les détails de l'utilisateur connecté depuis le backend.
    */
   async getCurrentUser(): Promise<User | null> {
     const token = localStorage.getItem('token');
-    if (!token) return null;
+    if (!token) {
+      return null;
+    }
 
-    const decoded = parseJwt(token);
-    if (!decoded || !decoded.sub) return null;
+    try {
+      const response = await api.get<User>('/users/me');
+      return response.data;
+    } catch (error: any) {
+      const status = error?.response?.status;
+      if (status === 401 || status === 403) {
+        throw new Error('Utilisateur connecté introuvable. Veuillez vous reconnecter.');
+      }
 
-    const email = decoded.sub;
-
-    // Récupère la liste de tous les utilisateurs pour trouver celui connecté
-    const response = await api.get<User[]>('/users');
-    const currentUser = response.data.find((u: User) => u.email === email);
-    
-    return currentUser || null;
+      console.error('Erreur lors de la récupération de l’utilisateur connecté', error);
+      throw new Error('Impossible de charger le profil utilisateur. Vérifiez votre connexion.');
+    }
   },
 
   /**
@@ -86,10 +102,11 @@ export const authService = {
   },
 
   /**
-   * Vérifie si l'utilisateur est connecté (présence du token).
+   * Vérifie si l'utilisateur est connecté et que le token JWT n'est pas expiré.
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    return isTokenValid(token);
   }
 };
 

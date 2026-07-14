@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AuthField, Brand } from './AuthIcons'
 import {
   AiOutlineUser,
@@ -8,11 +8,12 @@ import {
   AiOutlineFileText,
   AiOutlineCalculator,
   AiOutlineCloud,
-  AiOutlineGoogle,
-  AiOutlineArrowLeft,
+   AiOutlineArrowLeft,
 } from 'react-icons/ai'
 
 import type { SignupFormValues } from '../types'
+import {toast} from 'react-toastify'
+import authService from '../Services/auth'
 
 const benefits = [
   {
@@ -33,6 +34,7 @@ const benefits = [
 ]
 
 export default function Signup() {
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -48,8 +50,23 @@ export default function Signup() {
     },
   })
 
-  const onSubmit = (values: SignupFormValues) => {
-    console.log('signup', values)
+  const onSubmit = async (values: SignupFormValues) => {
+    try {
+      const response = await authService.signup(values);
+      console.log('Succès', response)
+      toast.success("Inscription faite avec succès.")
+      navigate('/login')
+    } catch (error: any) {
+      const statusCode = error?.response?.status;
+      console.log("Erreur d'inscription : ", error)
+      const errorMessage = error?.response?.data?.message ?? error?.message ?? "Erreur d'inscription";
+
+      if(statusCode === 400 || errorMessage.includes("Cet email est déja utilisé")){
+        toast.error("Cet email est déja utilisé")
+      } else {
+        toast.error(errorMessage);
+      }
+  } 
   }
 
   return (
@@ -105,13 +122,6 @@ export default function Signup() {
               <p className="mt-3 text-sm leading-6 text-textSecondary">
                 Remplissez le formulaire ci-dessous pour commencer.
               </p>
-
-              <button className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-textPrimary shadow-sm transition hover:border-slate-300">
-                <AiOutlineGoogle className="text-lg text-red-500" />
-                Continuer avec Google
-              </button>
-
-              <div className="my-6 text-center text-xs text-textSecondary">ou avec votre adresse e-mail</div>
 
               <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid gap-4 sm:grid-cols-2">

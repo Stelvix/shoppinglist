@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { AuthField, Brand } from './AuthIcons'
 import { Link, useNavigate } from 'react-router-dom'
@@ -5,11 +6,11 @@ import { AiOutlineMail, AiOutlineLock } from 'react-icons/ai'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 import authService from '../Services/auth'
 
-import Toast from '../Composables/Toast'
+import {toast} from 'react-toastify'
+
 
 
 import type { LoginFormValues } from '../types'
-import { useState } from 'react'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -25,36 +26,34 @@ export default function Login() {
     },
   })
 
-  const [toast, setToast] = useState <{
-  message: string;
-  type: "error" | "success" | "info";
-} |null>(null)
+  useEffect(() => {
+    const sessionExpired = localStorage.getItem('sessionExpired')
+    if (sessionExpired) {
+      toast.error("La session a expiré. Veuillez vous reconnecter.")
+      localStorage.removeItem('sessionExpired')
+    }
+  }, [])
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
+      await authService.login(values);
+      await authService.getCurrentUser();
+      toast.success('Connexion réussie!!');
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.log('Erreur : ', error);
 
-      const resp = await authService.login(values);
-      console.log("Succes : ", resp)
-      setToast({
-        message: "Connexion réussie, vous serais rediriger!",
-        type:'success'
-      });
-      setTimeout(() => {
-        setToast(null);
-      }, 3000)
-      navigate('/dashboard')
+      const statusCode = error?.response?.status;
+      const errorMessage = error?.response?.data?.message ?? error?.message ?? 'Erreur de connexion';
 
-      
-    } catch (error:any) {
-      console.log("Erreur : ", error)
-      setToast({
-        message: error?.response?.data?.message ?? error?.message ?? " Erreur de connexion",
-        type: "error"
-      });
-
-      setTimeout(() => {
-        setToast(null);
-      }, 3000)
+      if (error?.message === 'Utilisateur connecté introuvable. Veuillez vous reconnecter.') {
+        authService.logout();
+        toast.error(error.message);
+      } else if (statusCode === 401 || statusCode === 403) {
+        toast.error('Email ou mot de passe incorrect.');
+      } else {
+        toast.error(errorMessage);
+      }
     }
   }
 
@@ -72,9 +71,7 @@ export default function Login() {
               Retrouvez vos listes et continuez a suivre vos depenses.
             </p>
 
-            {toast && (
-              <Toast message={toast.message} type={toast.type} />
-            )}
+          
             <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
               <AuthField
                 label="Adresse e-mail"

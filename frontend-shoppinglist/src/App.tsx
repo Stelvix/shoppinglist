@@ -3,13 +3,16 @@ import { Login, Signup } from './Auth'
 import Dashboard from './Dashboard/Dashboard'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import authService from './Services/auth'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!authService.isAuthenticated()) {
     return <Navigate to="/login" replace />
   }
 
-  return children
+  return <>{children}</>
 }
 
 function App(){
@@ -29,6 +32,12 @@ function App(){
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <ToastContainer 
+        position="top-right" 
+        autoClose={4000} 
+        theme="colored" 
+      />
     </BrowserRouter>
   )
 }
