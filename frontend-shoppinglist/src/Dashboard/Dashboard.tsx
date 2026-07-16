@@ -1,45 +1,18 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
-import authService from "../Services/auth";
 import type { User, TypeDeCourse } from "../types"; // Assure-toi d'importer TypeDeCourse ici
-import DashboardLayout from "./DashboardLayout";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import typeDeCourseService from "../Services/Typesdecourses";
+import { AiFillPlusCircle } from "react-icons/ai";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useOutletContext<{ user: User | null }>()
   const [typesDeCourses, setTypesDeCourses] = useState<TypeDeCourse[]>([]);
-  const [loading, setLoading] = useState(true);
   const [loadingCourses, setLoadingCourses] = useState(false);
 
-  // 1. Récupération de l'utilisateur
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const details = await authService.getCurrentUser();
-        setUser(details);
-      } catch (error: any) {
-        console.error("Erreur lors de la récupération du user", error);
-        if (error?.message === 'Utilisateur connecté introuvable. Veuillez vous reconnecter.') {
-          toast.error(error.message);
-          authService.logout();
-          navigate('/login');
-          return;
-        }
-        toast.error('Impossible de charger le profil utilisateur.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [navigate]);
-
-  // 2. Récupération des types de courses (UNIQUEMENT quand "user" est disponible)
-  useEffect(() => {
-    if (!user) return; // On attend que le user soit chargé pour éviter l'erreur dans le service
+    if (!user) return;
 
     const fetchCourses = async () => {
       setLoadingCourses(true);
@@ -57,20 +30,15 @@ const Dashboard = () => {
     fetchCourses();
   }, [user]);
 
-  if (loading) {
-    return <div className="text-center p-4">Chargement du profil...</div>;
-  }
-
   return (
-    <DashboardLayout userName={user?.pseudo ?? 'Invité'}>
-      <div className="grid gap-6">
-        <div className="grid gap-2 lg:grid-cols-2">
-          
+    <div className="grid gap-6">
+      <div className="grid gap-2 lg:grid-cols-2">
+        
           {/* Bloc 1 : Aperçu rapide dynamique */}
           <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
             <div className="flex items-center">
               <AiOutlineShoppingCart className="text-2xl mr-2 text-blue-600 font-medium" />
-              <h2 className="text-xl font-black">Aperçu rapide</h2>
+              <h2 className="text-xl font-black text-blue-600">Vos listes de courses</h2>
             </div>
             
             <div className="mt-4">
@@ -90,6 +58,12 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+
+            <div className="py-2 bg-blue-100 flex items-center justify-center rounded-2xl mt-2 border-2 border-dashed border-blue-300 ">
+              <AiFillPlusCircle className="text-2xl text-blue-600"/>
+              <Link to={"create-type-course"} className="ml-2 text-blue-600 font-semibold">Nouvelle liste</Link>
+            </div>
+
           </div>
 
           {/* Bloc 2 : Autre aperçu rapide (placeholder ou à personnaliser) */}
@@ -113,8 +87,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
-  );
+   );
 };
 
 export default Dashboard;
