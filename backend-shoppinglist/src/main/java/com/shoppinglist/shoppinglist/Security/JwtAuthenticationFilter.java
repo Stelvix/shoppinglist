@@ -19,9 +19,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtAutentificationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAutentificationFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
     private JwtService jwtService;
@@ -52,7 +52,7 @@ public class JwtAutentificationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String username = jwtService.extractUsename(token);
+        String username = jwtService.extractUsername(token);
 
         // Si l'utilisateur n'est pas encore enregistré dans le contexte de cette
         // requête

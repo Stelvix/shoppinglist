@@ -15,6 +15,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,7 +59,12 @@ public class UsersController {
                         @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")
         })
         public ResponseEntity<UserResponseDTO> getUserById(
-                        @PathVariable @Parameter(description = "ID unique de l'utilisateur") UUID id) {
+                        @PathVariable @Parameter(description = "ID unique de l'utilisateur") UUID id,
+                        Authentication authentication) {
+                UserResponseDTO currentUser = usersServices.getUserByEmail(authentication.getName());
+                if (!currentUser.getId().equals(id)) {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
                 UserResponseDTO userDto = usersServices.getUserById(id);
                 return ResponseEntity.ok(userDto);
         }
@@ -112,7 +118,12 @@ public class UsersController {
         })
         public ResponseEntity<UserResponseDTO> updateUser(
                         @PathVariable UUID id,
-                        @RequestBody UserCreateDTO userCreateDTOdetails) {
+                        @RequestBody UserCreateDTO userCreateDTOdetails,
+                        Authentication authentication) {
+                UserResponseDTO currentUser = usersServices.getUserByEmail(authentication.getName());
+                if (!currentUser.getId().equals(id)) {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
                 UserResponseDTO updatedUser = usersServices.updateUser(id, userCreateDTOdetails);
                 return ResponseEntity.ok(updatedUser);
         }
@@ -127,7 +138,12 @@ public class UsersController {
                         @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")
         })
         public ResponseEntity<Void> deleteUser(
-                        @PathVariable @Parameter(description = "ID de l'utilisateur à supprimer") UUID id) {
+                        @PathVariable @Parameter(description = "ID de l'utilisateur à supprimer") UUID id,
+                        Authentication authentication) {
+                UserResponseDTO currentUser = usersServices.getUserByEmail(authentication.getName());
+                if (!currentUser.getId().equals(id)) {
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
                 usersServices.deleteUserById(id);
                 return ResponseEntity.noContent().build();
         }

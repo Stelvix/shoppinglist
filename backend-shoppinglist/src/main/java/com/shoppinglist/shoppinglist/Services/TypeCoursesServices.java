@@ -41,20 +41,27 @@ public class TypeCoursesServices {
     /**
      * Récupère un type de course par ID
      */
-    public TypeDeCourseResponseDTO getTypeDeCourseById(UUID id) {
+    public TypeDeCourseResponseDTO getTypeDeCourseById(UUID id, String email) {
         TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Type de course non trouvé avec id : " + id));
+        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+        }
         return convertTCourseResponseDTO(typeDeCourse);
     }
 
     /**
      * Crée un nouveau type de course
      */
-    public TypeDeCourseResponseDTO createTypeDeCourse(UUID UserId, TypeDeCourseCreateDTO typeDeCourseDto) {
+    public TypeDeCourseResponseDTO createTypeDeCourse(UUID UserId, TypeDeCourseCreateDTO typeDeCourseDto, String email) {
         // je reherde d'abord le user
         User user = userRepository.findById(UserId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+
+        if (!user.getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé pour la création");
+        }
 
         TypeDeCourse typeDeCourse = new TypeDeCourse();
 
@@ -72,10 +79,14 @@ public class TypeCoursesServices {
     /**
      * Met à jour un type de course existant
      */
-    public TypeDeCourseResponseDTO updateTypeDeCourse(UUID id, TypeDeCourseCreateDTO typeDeCourseDetails) {
+    public TypeDeCourseResponseDTO updateTypeDeCourse(UUID id, TypeDeCourseCreateDTO typeDeCourseDetails, String email) {
         TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Type de course non trouvé"));
+
+        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+        }
 
         typeDeCourse.setName(typeDeCourseDetails.getName());
         typeDeCourse.setDescription(typeDeCourseDetails.getDescription());
@@ -88,17 +99,26 @@ public class TypeCoursesServices {
     /**
      * Supprime un type de course par ID
      */
-    public void deleteTypeDeCourseById(UUID id) {
-        if (!typesCoursesRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Type de course non trouvé");
+    public void deleteTypeDeCourseById(UUID id, String email) {
+        TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Type de course non trouvé"));
+
+        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
         }
-        typesCoursesRepository.deleteById(id);
+        typesCoursesRepository.delete(typeDeCourse);
     }
 
     // service spécial
     // Récuperer une liste de courses en fonction d'un utilisateur
-    public List<TypeDeCourseResponseDTO> getTypeDeCourseByuserId(UUID id) {
+    public List<TypeDeCourseResponseDTO> getTypeDeCourseByuserId(UUID id, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+        if (!user.getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé");
+        }
+
         List<TypeDeCourse> types = typesCoursesRepository.findByUserId(id);
         return types
                 .stream()
@@ -144,6 +164,15 @@ public class TypeCoursesServices {
             // un null
             return List.of();
         }
+    }
+
+    public List<TypeDeCourseResponseDTO> getTypeDeCourseByUserEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+        List<TypeDeCourse> types = typesCoursesRepository.findByUserId(user.getId());
+        return types.stream()
+                .map(this::convertTCourseResponseDTO)
+                .toList();
     }
 
     // Mapping du DTO

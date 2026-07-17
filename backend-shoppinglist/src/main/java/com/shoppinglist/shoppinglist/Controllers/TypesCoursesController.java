@@ -2,6 +2,7 @@ package com.shoppinglist.shoppinglist.Controllers;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +40,8 @@ public class TypesCoursesController {
         @GetMapping
         @Operation(summary = "Récupère tous les types de courses", description = "Retourne une liste de tous les types de courses disponibles")
         @ApiResponse(responseCode = "200", description = "Liste des types de courses récupérée avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class)))
-        public List<TypeDeCourseResponseDTO> getTypeDeCourses() {
-                return typeCoursesServices.getAllTypeDeCourses();
+        public List<TypeDeCourseResponseDTO> getTypeDeCourses(Authentication authentication) {
+                return typeCoursesServices.getTypeDeCourseByUserEmail(authentication.getName());
         }
 
         /**
@@ -53,8 +54,9 @@ public class TypesCoursesController {
                         @ApiResponse(responseCode = "404", description = "Type de course non trouvé")
         })
         public ResponseEntity<TypeDeCourseResponseDTO> getTypeDeCourseById(
-                        @PathVariable @Parameter(description = "ID unique du type de course") UUID id) {
-                TypeDeCourseResponseDTO typeDeCourseDto = typeCoursesServices.getTypeDeCourseById(id);
+                        @PathVariable @Parameter(description = "ID unique du type de course") UUID id,
+                        Authentication authentication) {
+                TypeDeCourseResponseDTO typeDeCourseDto = typeCoursesServices.getTypeDeCourseById(id, authentication.getName());
                 return ResponseEntity.ok(typeDeCourseDto);
         }
 
@@ -69,9 +71,10 @@ public class TypesCoursesController {
         })
         public ResponseEntity<TypeDeCourseResponseDTO> createTypeDeCourse(
                         @PathVariable UUID userId,
-                        @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto) {
+                        @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto,
+                        Authentication authentication) {
                 TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(userId,
-                                typeDeCourseDto);
+                                typeDeCourseDto, authentication.getName());
 
                 URI locationUri = ServletUriComponentsBuilder
                                 .fromCurrentRequest()
@@ -96,9 +99,10 @@ public class TypesCoursesController {
         })
         public ResponseEntity<TypeDeCourseResponseDTO> updateTypeDeCourse(
                         @PathVariable @Parameter(description = "ID du type de course à mettre à jour") UUID id,
-                        @RequestBody @Parameter(description = "Nouvelles données du type de course") TypeDeCourseCreateDTO typeDeCourseDetailsDto) {
+                        @RequestBody @Parameter(description = "Nouvelles données du type de course") TypeDeCourseCreateDTO typeDeCourseDetailsDto,
+                        Authentication authentication) {
                 TypeDeCourseResponseDTO typeDeCourseDto = typeCoursesServices.updateTypeDeCourse(id,
-                                typeDeCourseDetailsDto);
+                                typeDeCourseDetailsDto, authentication.getName());
                 return ResponseEntity.ok(typeDeCourseDto);
         }
 
@@ -112,8 +116,9 @@ public class TypesCoursesController {
                         @ApiResponse(responseCode = "404", description = "Type de course non trouvé")
         })
         public ResponseEntity<Void> deleteTypeDeCourse(
-                        @PathVariable @Parameter(description = "ID du type de course à supprimer") UUID id) {
-                typeCoursesServices.deleteTypeDeCourseById(id);
+                        @PathVariable @Parameter(description = "ID du type de course à supprimer") UUID id,
+                        Authentication authentication) {
+                typeCoursesServices.deleteTypeDeCourseById(id, authentication.getName());
                 return ResponseEntity.noContent().build();
         }
 
@@ -121,8 +126,8 @@ public class TypesCoursesController {
          * ENDPOINT SPECIAL POUR RENVOYER LES LISTES DE COURSES EN FONCTION DU USER
          */
         @GetMapping("/user/{userId}")
-        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(@PathVariable UUID userId) {
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByuserId(userId);
+        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(@PathVariable UUID userId, Authentication authentication) {
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByuserId(userId, authentication.getName());
                 return ResponseEntity.ok(types);
         }
 

@@ -31,8 +31,8 @@ public class JwtService {
 
     }
 
-    // fonction pour extraire me nom d'utilisateur du token
-    public String extractUsename(String token) {
+    // fonction pour extraire le nom d'utilisateur du token
+    public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
