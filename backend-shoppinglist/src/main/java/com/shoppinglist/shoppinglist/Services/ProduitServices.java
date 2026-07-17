@@ -26,29 +26,39 @@ public class ProduitServices {
 
     // je récupère tout les produits
 
-    public List<ProduitResponseDTO> getAllProduits() {
+    public List<ProduitResponseDTO> getAllProduits(String email) {
         return produitRepository.findAll()
                 .stream()
+                .filter(p -> p.getTypeDeCourse() != null && p.getTypeDeCourse().getUser() != null 
+                        && p.getTypeDeCourse().getUser().getEmail().equals(email))
                 .map(this::convertToResponseDTO)
                 .toList();
     }
 
     // je get les produits par id
-    public ProduitResponseDTO getProduitsById(UUID id) {
+    public ProduitResponseDTO getProduitsById(UUID id, String email) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Produit non trouvé"));
+        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null 
+                && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
+        }
         return convertToResponseDTO(produit);
     }
 
     // faire un post
-    public ProduitResponseDTO CreateProduits(UUID typedeCourseId, ProduitCreateDTO produitCreateDTO) {
+    public ProduitResponseDTO CreateProduits(UUID typedeCourseId, ProduitCreateDTO produitCreateDTO, String email) {
 
         // pour creer un produit il faut une liste de course alors je recherche dabord
         // la liste
 
         TypeDeCourse typeDeCourse = typesCoursesRepository.findById(typedeCourseId)
-                .orElseThrow(() -> new RuntimeException("Liste non trouvée"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Liste non trouvée"));
+
+        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+        }
 
         Produit produit = new Produit();
         produit.setName(produitCreateDTO.getName());
@@ -63,10 +73,15 @@ public class ProduitServices {
     }
 
     // modifier un produit
-    public ProduitResponseDTO updateProduit(ProduitCreateDTO produitDetailsDTO, UUID id) {
+    public ProduitResponseDTO updateProduit(ProduitCreateDTO produitDetailsDTO, UUID id, String email) {
         // on recherche d'abord l'id et on s'assure qu'il existe
         Produit produit = produitRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Produit non trouvé"));
+
+        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null 
+                && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
+        }
 
         produit.setName(produitDetailsDTO.getName());
         produit.setPrix(produitDetailsDTO.getPrix());
@@ -77,12 +92,32 @@ public class ProduitServices {
     }
 
     // supprimer un produit on met void car la suppression ne retourne rien
-    public void deleteProduitById(UUID id) {
-        if (!produitRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Produit non trouvé");
+    public void deleteProduitById(UUID id, String email) {
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Produit non trouvé"));
+
+        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null 
+                && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
         }
-        produitRepository.deleteById(id);
+        produitRepository.delete(produit);
+    }
+
+    // Récupérer les produits d'une liste
+    public List<ProduitResponseDTO> getProduitsByListId(UUID listId, String email) {
+        TypeDeCourse typeDeCourse = typesCoursesRepository.findById(listId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Liste non trouvée avec l'id : " + listId));
+
+        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+        }
+
+        return produitRepository.findByTypeDeCourseId(listId)
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
     // Mapping du DTO

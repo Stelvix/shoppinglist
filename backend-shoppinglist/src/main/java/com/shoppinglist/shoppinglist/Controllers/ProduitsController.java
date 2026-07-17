@@ -3,6 +3,7 @@ package com.shoppinglist.shoppinglist.Controllers;
 import com.shoppinglist.shoppinglist.Models.Produit;
 import com.shoppinglist.shoppinglist.Dtos.ProduitCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.ProduitResponseDTO;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +44,8 @@ public class ProduitsController {
         @GetMapping
         @Operation(summary = "Récupère tous les produits", description = "Retourne une liste de tous les produits enregistrés")
         @ApiResponse(responseCode = "200", description = "Liste des produits récupérée avec succès", content = @Content(schema = @Schema(implementation = Produit.class)))
-        public List<ProduitResponseDTO> getProduits() {
-                return produitServices.getAllProduits();
+        public List<ProduitResponseDTO> getProduits(Authentication authentication) {
+                return produitServices.getAllProduits(authentication.getName());
         }
 
         /**
@@ -57,8 +58,9 @@ public class ProduitsController {
                         @ApiResponse(responseCode = "404", description = "Produit non trouvé")
         })
         public ResponseEntity<ProduitResponseDTO> getProduitById(
-                        @PathVariable @Parameter(description = "ID unique du produit") UUID id) {
-                ProduitResponseDTO produitDto = produitServices.getProduitsById(id);
+                        @PathVariable @Parameter(description = "ID unique du produit") UUID id,
+                        Authentication authentication) {
+                ProduitResponseDTO produitDto = produitServices.getProduitsById(id, authentication.getName());
                 return ResponseEntity.ok(produitDto);
         }
 
@@ -73,8 +75,9 @@ public class ProduitsController {
         })
         public ResponseEntity<ProduitResponseDTO> createProduit(
                         @PathVariable UUID typeDeCourseId,
-                        @RequestBody @Parameter(description = "Données du produit à créer") ProduitCreateDTO produitCreateDTO) {
-                ProduitResponseDTO savedProduit = produitServices.CreateProduits(typeDeCourseId, produitCreateDTO);
+                        @RequestBody @Parameter(description = "Données du produit à créer") ProduitCreateDTO produitCreateDTO,
+                        Authentication authentication) {
+                ProduitResponseDTO savedProduit = produitServices.CreateProduits(typeDeCourseId, produitCreateDTO, authentication.getName());
                 URI locationUri = ServletUriComponentsBuilder
                                 .fromCurrentRequest()
                                 .path("/{id}")
@@ -97,8 +100,9 @@ public class ProduitsController {
         })
         public ResponseEntity<ProduitResponseDTO> updateProduit(
                         @PathVariable @Parameter(description = "ID du produit à mettre à jour") UUID id,
-                        @RequestBody @Parameter(description = "Nouvelles données du produit") ProduitCreateDTO produitDetails) {
-                ProduitResponseDTO updateproduit = produitServices.updateProduit(produitDetails, id);
+                        @RequestBody @Parameter(description = "Nouvelles données du produit") ProduitCreateDTO produitDetails,
+                        Authentication authentication) {
+                ProduitResponseDTO updateproduit = produitServices.updateProduit(produitDetails, id, authentication.getName());
                 return ResponseEntity.ok(updateproduit);
         }
 
@@ -112,8 +116,26 @@ public class ProduitsController {
                         @ApiResponse(responseCode = "404", description = "Produit non trouvé")
         })
         public ResponseEntity<Void> deleteProduit(
-                        @PathVariable @Parameter(description = "ID du produit à supprimer") UUID id) {
-                produitServices.deleteProduitById(id);
+                        @PathVariable @Parameter(description = "ID du produit à supprimer") UUID id,
+                        Authentication authentication) {
+                produitServices.deleteProduitById(id, authentication.getName());
                 return ResponseEntity.noContent().build();
+        }
+
+        /**
+         * GET /api/produits/list/{typeDeCourseId} - Récupère tous les produits d'une liste
+         */
+        @GetMapping("/list/{typeDeCourseId}")
+        @Operation(summary = "Récupère les produits d'une liste de course", description = "Retourne la liste des produits pour une catégorie de course spécifique")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Produits récupérés avec succès"),
+                        @ApiResponse(responseCode = "404", description = "Liste non trouvée"),
+                        @ApiResponse(responseCode = "403", description = "Accès refusé")
+        })
+        public ResponseEntity<List<ProduitResponseDTO>> getProduitsByListId(
+                        @PathVariable UUID typeDeCourseId,
+                        Authentication authentication) {
+                List<ProduitResponseDTO> produits = produitServices.getProduitsByListId(typeDeCourseId, authentication.getName());
+                return ResponseEntity.ok(produits);
         }
 }

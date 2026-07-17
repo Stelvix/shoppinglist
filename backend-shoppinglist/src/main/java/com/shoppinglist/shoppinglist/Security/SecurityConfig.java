@@ -30,7 +30,7 @@ import com.shoppinglist.shoppinglist.Repository.UsersRepository;
 public class SecurityConfig {
 
         @Autowired
-        private JwtAutentificationFilter jwtAuthFilter;
+        private JwtAuthenticationFilter jwtAuthFilter;
 
         @Autowired
         private UsersRepository userRepository;
