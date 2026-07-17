@@ -28,6 +28,7 @@ export type ShoppingItem = Produit;
 export interface TypeDeCourseCreateDTO {
   name: string;
   description?: string;
+  userId: string;
 }
 
 export type CreateListRequest = TypeDeCourseCreateDTO;

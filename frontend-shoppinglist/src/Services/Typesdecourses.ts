@@ -1,18 +1,14 @@
 import type { TypeDeCourse } from "../types";
 import authService from "./auth";
+import api from "./axios";
 
 const typeDeCourseService = {
-  async getTypeDecoursesByuserId(): Promise<void> {
-
+  async getTypeDecoursesByuserId(): Promise<TypeDeCourse[]> {
     const user = await authService.getCurrentUser();
+    if (!user?.id) throw new Error("Utilisateur non connecté");
 
-    if (!user) {
-      throw new Error("Utilisateur non connecté");
-    }
-
-    const userId = user.id;
-
-    console.log("User id:", userId);
+    const { data } = await api.get<TypeDeCourse[]>(`/type_de_courses/user/${user.id}`);
+    return data;
   }
 };
 
