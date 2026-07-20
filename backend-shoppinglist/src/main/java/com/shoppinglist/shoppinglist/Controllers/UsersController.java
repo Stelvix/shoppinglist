@@ -55,7 +55,7 @@ public class UsersController {
         @GetMapping("/{id}")
         @Operation(summary = "Récupère un utilisateur par ID", description = "Retourne un utilisateur spécifique basé sur son ID")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Utilisateur trouvé", content = @Content(schema = @Schema(implementation = User.class))),
+                        @ApiResponse(responseCode = "200", description = "Utilisateur trouvé", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
                         @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")
         })
         public ResponseEntity<UserResponseDTO> getUserById(
@@ -87,7 +87,7 @@ public class UsersController {
         @PostMapping
         @Operation(summary = "Crée un nouvel utilisateur", description = "Ajoute un nouvel utilisateur à la base de données")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "201", description = "Utilisateur créé avec succès", content = @Content(schema = @Schema(implementation = User.class))),
+                        @ApiResponse(responseCode = "201", description = "Utilisateur créé avec succès", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
         public ResponseEntity<UserResponseDTO> createUser(
@@ -112,7 +112,7 @@ public class UsersController {
         @PutMapping("/{id}")
         @Operation(summary = "Met à jour un utilisateur", description = "Modifie les informations d'un utilisateur existant")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Utilisateur mis à jour avec succès", content = @Content(schema = @Schema(implementation = User.class))),
+                        @ApiResponse(responseCode = "200", description = "Utilisateur mis à jour avec succès", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
                         @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé"),
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
