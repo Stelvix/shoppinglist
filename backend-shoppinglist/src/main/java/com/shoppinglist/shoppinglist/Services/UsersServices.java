@@ -15,10 +15,13 @@ import com.shoppinglist.shoppinglist.Dtos.UserResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Service
 @RequiredArgsConstructor
 public class UsersServices {
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // GET ALL
     public List<UserResponseDTO> getAllUsers() {
@@ -43,6 +46,9 @@ public class UsersServices {
         user.setLname(userCreateDTO.getLname());
         user.setPseudo(userCreateDTO.getPseudo());
         user.setEmail(userCreateDTO.getEmail());
+        if (userCreateDTO.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userCreateDTO.getPassword()));
+        }
         user.setCreatedAt(OffsetDateTime.now());
         // user.setUpdatedAt(OffsetDateTime.now());
 
