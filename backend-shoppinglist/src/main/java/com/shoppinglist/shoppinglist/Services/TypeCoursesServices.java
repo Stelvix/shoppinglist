@@ -71,7 +71,8 @@ public class TypeCoursesServices {
     /**
      * Met à jour un type de course existant
      */
-    public TypeDeCourseResponseDTO updateTypeDeCourse(UUID id, TypeDeCourseCreateDTO typeDeCourseDetails, String email) {
+    public TypeDeCourseResponseDTO updateTypeDeCourse(UUID id, TypeDeCourseCreateDTO typeDeCourseDetails,
+            String email) {
         TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Type de course non trouvé"));
@@ -150,7 +151,6 @@ public class TypeCoursesServices {
         } catch (Exception e) {
 
             System.err.println("Erreur lors de la récupération des types de courses par jour : " + e.getMessage());
-            
 
             // On retourne une liste vide pour éviter de casser l'application et de renvoyer
             // un null

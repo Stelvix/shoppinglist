@@ -44,7 +44,7 @@ public class UsersController {
          */
         @GetMapping
         @Operation(summary = "Récupère tous les utilisateurs", description = "Retourne une liste de tous les utilisateurs enregistrés")
-        @ApiResponse(responseCode = "200", description = "Liste des utilisateurs récupérée avec succès", content = @Content(schema = @Schema(implementation = User.class)))
+        @ApiResponse(responseCode = "200", description = "Liste des utilisateurs récupérée avec succès", content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
         public List<UserResponseDTO> getUsers() {
                 return usersServices.getAllUsers();
         }
