@@ -21,8 +21,6 @@ import com.shoppinglist.shoppinglist.Models.TypeDeCourse;
 import lombok.RequiredArgsConstructor;
 
 import java.net.URI;
-import java.sql.Date;
-import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -63,17 +61,16 @@ public class TypesCoursesController {
         /**
          * POST /api/type_de_courses - Crée un nouveau type de course
          */
-        @PostMapping("typedecourses/{userId}")
+        @PostMapping("typedecourses")
         @Operation(summary = "Crée un nouveau type de course", description = "Ajoute une nouvelle catégorie de courses à la base de données")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "201", description = "Type de course créé avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourseResponseDTO.class))),
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
         public ResponseEntity<TypeDeCourseResponseDTO> createTypeDeCourse(
-                        @PathVariable UUID userId,
                         @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto,
                         Authentication authentication) {
-                TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(userId,
+                TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(
                                 typeDeCourseDto, authentication.getName());
 
                 URI locationUri = ServletUriComponentsBuilder
@@ -125,9 +122,9 @@ public class TypesCoursesController {
         /**
          * ENDPOINT SPECIAL POUR RENVOYER LES LISTES DE COURSES EN FONCTION DU USER
          */
-        @GetMapping("/user/{userId}")
-        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(@PathVariable UUID userId, Authentication authentication) {
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByuserId(userId, authentication.getName());
+        @GetMapping("/user")
+        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(Authentication authentication) {
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByUserEmail(authentication.getName());
                 return ResponseEntity.ok(types);
         }
 
@@ -156,5 +153,4 @@ public class TypesCoursesController {
                 return ResponseEntity.ok(types);
 
         }
-        // test de déploiement      
 }

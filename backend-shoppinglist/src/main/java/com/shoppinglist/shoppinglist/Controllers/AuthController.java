@@ -14,8 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.shoppinglist.shoppinglist.Models.User;
+import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
+import com.shoppinglist.shoppinglist.Dtos.UserLoginDTO;
 import com.shoppinglist.shoppinglist.Repository.UsersRepository;
 import com.shoppinglist.shoppinglist.Services.JwtService;
+
+import java.util.Map;
+
+import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,26 +41,32 @@ public class AuthController {
 
     // Inscription d'un nouvel utilisateur
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        if (usersRepository.findByEmail(user.getEmail()).isPresent()) {
+    public ResponseEntity<String> register(@RequestBody UserCreateDTO userDto) {
+        if (usersRepository.findByEmail(userDto.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Erreur : Cet email est déja utilisé !");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setEmail(userDto.getEmail());
+        user.setName(userDto.getName());
+        user.setLname(userDto.getLname());
+        user.setPseudo(userDto.getPseudo());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
         usersRepository.save(user);
 
         return ResponseEntity.ok("Utilisateur inscrit avec succès !");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User loginRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody UserLoginDTO loginRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
             String token = jwtService.generationToken(loginRequest.getEmail());
 
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(Map.of("token", token));
 
         } catch (AuthenticationException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email ou mot de passe incorrect");
