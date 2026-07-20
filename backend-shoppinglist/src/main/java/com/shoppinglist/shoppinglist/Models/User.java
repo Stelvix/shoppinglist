@@ -8,10 +8,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Collections; // 👈 Utilisation de l'import standard Java
+import java.util.Collections;
 import java.util.UUID;
 
 @Getter
@@ -47,11 +48,13 @@ public class User implements UserDetails {
     @Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
     private String email;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)
     private String password;
 
     // MISE EN PLACE DE L'INTERFACE USERDETAILS
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
@@ -62,12 +65,12 @@ public class User implements UserDetails {
         return this.email;
     }
 
-    @Override 
+    @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @Override 
+    @Override
     public boolean isAccountNonLocked() {
         return true;
     }
