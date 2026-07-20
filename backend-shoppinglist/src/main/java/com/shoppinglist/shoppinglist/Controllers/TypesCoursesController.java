@@ -54,7 +54,8 @@ public class TypesCoursesController {
         public ResponseEntity<TypeDeCourseResponseDTO> getTypeDeCourseById(
                         @PathVariable @Parameter(description = "ID unique du type de course") UUID id,
                         Authentication authentication) {
-                TypeDeCourseResponseDTO typeDeCourseDto = typeCoursesServices.getTypeDeCourseById(id, authentication.getName());
+                TypeDeCourseResponseDTO typeDeCourseDto = typeCoursesServices.getTypeDeCourseById(id,
+                                authentication.getName());
                 return ResponseEntity.ok(typeDeCourseDto);
         }
 
@@ -70,6 +71,10 @@ public class TypesCoursesController {
         public ResponseEntity<TypeDeCourseResponseDTO> createTypeDeCourse(
                         @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto,
                         Authentication authentication) {
+
+                System.out.println("USER CONNECTE : " + authentication.getName());
+                System.out.println("AUTH : " + authentication);
+
                 TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(
                                 typeDeCourseDto, authentication.getName());
 
@@ -124,7 +129,8 @@ public class TypesCoursesController {
          */
         @GetMapping("/user")
         public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(Authentication authentication) {
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCourseByUserEmail(authentication.getName());
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices
+                                .getTypeDeCourseByUserEmail(authentication.getName());
                 return ResponseEntity.ok(types);
         }
 

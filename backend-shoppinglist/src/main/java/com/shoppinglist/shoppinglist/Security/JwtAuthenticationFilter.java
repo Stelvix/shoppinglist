@@ -11,6 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.shoppinglist.shoppinglist.Services.JwtService;
 
 import jakarta.servlet.FilterChain;
@@ -33,38 +36,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Récupération du header Authorization de la requête
         String authHeader = request.getHeader("Authorization");
 
-        // Vérification du format du Bearer
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extraction du token (on ignore les 7 premiers caractères : "Bearer ")
         String token = authHeader.substring(7);
 
-        // Validation du token et authentification de l'utilisateur
         if (!jwtService.isTokenValid(token)) {
-            logger.warn("JWT invalide ou expiré pour la requête {}", request.getRequestURI());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT invalide ou expiré");
+            logger.warn("JWT invalide");
+            response.sendError(401, "JWT invalide");
             return;
         }
 
-        String username = jwtService.extractUsername(token);
+        String email = jwtService.extractUsername(token);
 
-        // Si l'utilisateur n'est pas encore enregistré dans le contexte de cette
-        // requête
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    username, null, Collections.emptyList());
 
-            // On enregistre l'utilisateur dans le contexte de Spring Security
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    email,
+                    null,
+                    Collections.emptyList());
+
+            SecurityContextHolder.getContext()
+                    .setAuthentication(authentication);
         }
 
-        // On continue vers le filtre suivant
         filterChain.doFilter(request, response);
     }
 }
