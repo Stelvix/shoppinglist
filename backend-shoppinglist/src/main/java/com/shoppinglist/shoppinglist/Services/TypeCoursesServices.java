@@ -54,26 +54,18 @@ public class TypeCoursesServices {
     /**
      * Crée un nouveau type de course
      */
-    public TypeDeCourseResponseDTO createTypeDeCourse(UUID UserId, TypeDeCourseCreateDTO typeDeCourseDto, String email) {
-        // je reherde d'abord le user
-        User user = userRepository.findById(UserId)
+    public TypeDeCourseResponseDTO createTypeDeCourse(TypeDeCourseCreateDTO typeDeCourseDto, String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
 
-        if (!user.getEmail().equals(email)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé pour la création");
-        }
-
         TypeDeCourse typeDeCourse = new TypeDeCourse();
-
         typeDeCourse.setName(typeDeCourseDto.getName());
         typeDeCourse.setDescription(typeDeCourseDto.getDescription());
         typeDeCourse.setCreatedAt(OffsetDateTime.now());
         typeDeCourse.setUser(user);
 
-        // flush
-
-        TypeDeCourse CreatedTypedeCourses = typesCoursesRepository.save(typeDeCourse);
-        return convertTCourseResponseDTO(CreatedTypedeCourses);
+        TypeDeCourse createdTypedeCourses = typesCoursesRepository.save(typeDeCourse);
+        return convertTCourseResponseDTO(createdTypedeCourses);
     }
 
     /**
