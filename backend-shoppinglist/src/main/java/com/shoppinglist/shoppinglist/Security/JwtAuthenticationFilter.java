@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-
+ 
 import com.shoppinglist.shoppinglist.Services.JwtService;
 
 import jakarta.servlet.FilterChain;
