@@ -45,9 +45,18 @@ public class TypeCoursesServices {
         TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Type de course non trouvé avec id : " + id));
-        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+
+        // Vérification sécurisée avec trim() et ignoreCase
+        if (typeDeCourse.getUser() != null) {
+            String ownerEmail = typeDeCourse.getUser().getEmail();
+
+            if (ownerEmail == null || !ownerEmail.trim().equalsIgnoreCase(email.trim())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+            }
         }
+
+        System.out.println(
+                "DEBUG - Email BDD: '" + typeDeCourse.getUser().getEmail() + "' | Email Token: '" + email + "'");
         return convertTCourseResponseDTO(typeDeCourse);
     }
 
