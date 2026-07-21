@@ -37,7 +37,7 @@ export default function Login() {
   const onSubmit = async (values: LoginFormValues) => {
     try {
       await authService.login(values);
-      await authService.getCurrentUser();
+    //  await authService.getCurrentUser();
       toast.success('Connexion réussie!!');
       navigate('/dashboard');
     } catch (error: any) {

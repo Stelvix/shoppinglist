@@ -1,5 +1,6 @@
 import api from './axios';
 import type { LoginFormValues, SignupFormValues, User } from '../types';
+import type { TokenResponse } from '../types';
 
 /**
  * Fonction utilitaire pour décoder un JWT sans bibliothèque externe.
@@ -39,12 +40,13 @@ export const authService = {
    * Connexion de l'utilisateur. Le backend retourne directement le token JWT sous forme de chaîne de caractères.
    */
   async login(credentials: LoginFormValues): Promise<string> {
-    const response = await api.post<string>('/auth/login', {
+    const response = await api.post<TokenResponse>('/auth/login', {
       email: credentials.email,
       password: credentials.password
     });
 
-    const token = response.data;
+    const token = response.data.token;
+    console.log('voici le token', token.toString())
 
     if (!token) {
       throw new Error('Token manquant dans la réponse serveur');
