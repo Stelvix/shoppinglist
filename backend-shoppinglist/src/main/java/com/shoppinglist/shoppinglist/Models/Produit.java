@@ -29,7 +29,7 @@ public class Produit {
     private BigDecimal prix;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "type_de_course_id", nullable = false)
     private TypeDeCourse typeDeCourse;
 

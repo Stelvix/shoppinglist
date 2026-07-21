@@ -18,5 +18,5 @@ public class ProduitResponseDTO {
     private BigDecimal prix;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private GetTypeCourse typeDeCourses;
+    // private GetTypeCourse typeDeCourses;
 }

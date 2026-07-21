@@ -29,7 +29,7 @@ public class ProduitServices {
     public List<ProduitResponseDTO> getAllProduits(String email) {
         return produitRepository.findAll()
                 .stream()
-                .filter(p -> p.getTypeDeCourse() != null && p.getTypeDeCourse().getUser() != null 
+                .filter(p -> p.getTypeDeCourse() != null && p.getTypeDeCourse().getUser() != null
                         && p.getTypeDeCourse().getUser().getEmail().equals(email))
                 .map(this::convertToResponseDTO)
                 .toList();
@@ -40,7 +40,7 @@ public class ProduitServices {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Produit non trouvé"));
-        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null 
+        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null
                 && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
         }
@@ -78,7 +78,7 @@ public class ProduitServices {
         Produit produit = produitRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Produit non trouvé"));
 
-        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null 
+        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null
                 && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
         }
@@ -97,7 +97,7 @@ public class ProduitServices {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Produit non trouvé"));
 
-        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null 
+        if (produit.getTypeDeCourse() != null && produit.getTypeDeCourse().getUser() != null
                 && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
         }
@@ -135,8 +135,7 @@ public class ProduitServices {
                 produit.getName(),
                 produit.getPrix(),
                 produit.getCreatedAt(),
-                produit.getUpdatedAt(),
-                dtoTypeCourse);
+                produit.getUpdatedAt());
 
     }
 

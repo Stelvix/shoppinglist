@@ -11,6 +11,8 @@ import java.util.UUID;
 import com.shoppinglist.shoppinglist.Dtos.TypeDeCourseCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.TypeDeCourseResponseDTO;
 
+import com.shoppinglist.shoppinglist.Dtos.ProduitResponseDTO;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -178,11 +180,23 @@ public class TypeCoursesServices {
 
     // Mapping du DTO
     private TypeDeCourseResponseDTO convertTCourseResponseDTO(TypeDeCourse typeDeCourse) {
+
+        List<ProduitResponseDTO> produits = typeDeCourse.getProduits()
+                .stream()
+                .map(produit -> new ProduitResponseDTO(
+                        produit.getId(),
+                        produit.getName(),
+                        produit.getPrix(),
+                        produit.getCreatedAt(),
+                        produit.getUpdatedAt()))
+                .toList();
+
         return new TypeDeCourseResponseDTO(
                 typeDeCourse.getId(),
                 typeDeCourse.getName(),
                 typeDeCourse.getDescription(),
                 typeDeCourse.getCreatedAt(),
-                typeDeCourse.getUpdatedAt());
+                typeDeCourse.getUpdatedAt(),
+                produits);
     }
 }
