@@ -4,10 +4,8 @@ import authService from '../Services/auth'
 import type { User } from '../types'
 
 const navigation = [
-  { label: 'Tableau de bord', key: 'dashboard', href:"/dashboard" },
-  { label: 'Mes listes', key: 'lists', href:'listes-courses' },
-  { label: 'Mes courses', key: 'shopping', href:'jgjr' },
-  { label: 'Paramètres', key: 'settings', href:'jzorjojfrzofjr' },
+  { label: 'Mes listes', key: 'dashboard', href: '/dashboard' },
+  { label: 'Créer une liste', key: 'create-list', href: '/dashboard/create-type-course' },
 ]
 
 export default function DashboardLayout() {
@@ -76,17 +74,22 @@ export default function DashboardLayout() {
           </div>
 
           <nav className="mt-6 flex flex-wrap gap-2">
-            {navigation.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
-              >
-                <Link to={item.href}>
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.key}
+                  to={item.href}
+                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                    isActive
+                      ? 'border-primary bg-primary text-white shadow-sm'
+                      : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
                   {item.label}
                 </Link>
-              </button>
-            ))}
+              );
+            })}
           </nav>
         </header>
 

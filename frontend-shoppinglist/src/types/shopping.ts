@@ -4,6 +4,7 @@ export interface TypeDeCourse {
   description?: string;
   createdAt: string;
   updatedAt: string;
+  produits?: Produit[];
 }
 
 // Alias pour faciliter le développement côté frontend
@@ -28,7 +29,7 @@ export type ShoppingItem = Produit;
 export interface TypeDeCourseCreateDTO {
   name: string;
   description?: string;
-  userId: string;
+  userEmail: string;
 }
 
 export type CreateListRequest = TypeDeCourseCreateDTO;

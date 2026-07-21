@@ -4,6 +4,7 @@ import type { User, TypeDeCourseCreateDTO } from '../types'
 import { TypeDeCourseFields } from '../Forms/typeDecourse'
 import { AiOutlineShoppingCart, AiFillFileText } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
+import typeDeCourseService from '../Services/Typesdecourses'
 
 const TypedecoursesForm = () => {
   const { user } = useOutletContext<{ user: User | null }>()
@@ -18,11 +19,11 @@ const TypedecoursesForm = () => {
     try {
       const payload = {
         ...data,
-        userId: user?.id ?? '',
-      }
+       }
 
       // appeler le service de création de type de course ici
-      console.log('Création type de course', payload)
+        //console.log('Création type de course', payload)
+        await typeDeCourseService.createTypedecourse(payload)
       toast.success('Type de course créé avec succès !')
       reset()
     } catch (error) {
