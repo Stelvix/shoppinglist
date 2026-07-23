@@ -25,6 +25,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/type_de_courses")
 @RequiredArgsConstructor
@@ -62,18 +64,15 @@ public class TypesCoursesController {
         /**
          * POST /api/type_de_courses - Crée un nouveau type de course
          */
-        @PostMapping("typedecourses")
+        @PostMapping
         @Operation(summary = "Crée un nouveau type de course", description = "Ajoute une nouvelle catégorie de courses à la base de données")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "201", description = "Type de course créé avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourseResponseDTO.class))),
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
         public ResponseEntity<TypeDeCourseResponseDTO> createTypeDeCourse(
-                        @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto,
+                        @Valid @RequestBody @Parameter(description = "Données du type de course à créer") TypeDeCourseCreateDTO typeDeCourseDto,
                         Authentication authentication) {
-
-                System.out.println("USER CONNECTE : " + authentication.getName());
-                System.out.println("AUTH : " + authentication);
 
                 TypeDeCourseResponseDTO savedTypeDeCourse = typeCoursesServices.createTypeDeCourse(
                                 typeDeCourseDto, authentication.getName());
@@ -101,7 +100,7 @@ public class TypesCoursesController {
         })
         public ResponseEntity<TypeDeCourseResponseDTO> updateTypeDeCourse(
                         @PathVariable @Parameter(description = "ID du type de course à mettre à jour") UUID id,
-                        @RequestBody @Parameter(description = "Nouvelles données du type de course") TypeDeCourseCreateDTO typeDeCourseDetailsDto,
+                        @Valid @RequestBody @Parameter(description = "Nouvelles données du type de course") TypeDeCourseCreateDTO typeDeCourseDetailsDto,
                         Authentication authentication) {
                 TypeDeCourseResponseDTO typeDeCourseDto = typeCoursesServices.updateTypeDeCourse(id,
                                 typeDeCourseDetailsDto, authentication.getName());
@@ -140,8 +139,9 @@ public class TypesCoursesController {
          */
         @GetMapping("/typeDeCourse/{date}")
         public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByDate(
-                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date) {
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesBySpecifiedDate(date);
+                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date,
+                        Authentication authentication) {
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesBySpecifiedDate(date, authentication.getName());
                 return ResponseEntity.ok(types);
         }
 
@@ -153,9 +153,10 @@ public class TypesCoursesController {
         @GetMapping("/by-day/{date}")
         @ApiResponse(responseCode = "200", description = "Type de courses récupéré avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class)))
         public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCoursesByDay(
-                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date) {
+                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date,
+                        Authentication authentication) {
 
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesByDay(date);
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesByDay(date, authentication.getName());
                 return ResponseEntity.ok(types);
 
         }

@@ -130,9 +130,12 @@ public class TypeCoursesServices {
                 .toList(); // pour chaques type de courses on les map en DTO
     }
 
-    // récupérer une liste de type de courses en fontion d'une date précise
-    public List<TypeDeCourseResponseDTO> getTypeDeCoursesBySpecifiedDate(OffsetDateTime date) {
-        List<TypeDeCourse> types = typesCoursesRepository.findByCreatedAt(date);
+    // récupérer une liste de type de courses en fonction d'une date précise pour l'utilisateur connecté
+    public List<TypeDeCourseResponseDTO> getTypeDeCoursesBySpecifiedDate(OffsetDateTime date, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+
+        List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAt(user.getId(), date);
 
         return types
                 .stream()
@@ -140,9 +143,12 @@ public class TypeCoursesServices {
                 .toList();
     }
 
-    // get les types de courses par jour
-    public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(OffsetDateTime dateTime) {
+    // get les types de courses par jour pour l'utilisateur connecté
+    public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(OffsetDateTime dateTime, String email) {
         try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+
             // 1. On extrait la date pure
             LocalDate localDate = dateTime.toLocalDate();
 
@@ -153,18 +159,14 @@ public class TypeCoursesServices {
             OffsetDateTime endOfDay = localDate.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
 
             // 4. Requête SQL automatique "BETWEEN"
-            List<TypeDeCourse> types = typesCoursesRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+            List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAtBetween(user.getId(), startOfDay, endOfDay);
 
             return types.stream()
                     .map(this::convertTCourseResponseDTO)
                     .toList();
 
         } catch (Exception e) {
-
             System.err.println("Erreur lors de la récupération des types de courses par jour : " + e.getMessage());
-
-            // On retourne une liste vide pour éviter de casser l'application et de renvoyer
-            // un null
             return List.of();
         }
     }
