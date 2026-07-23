@@ -21,7 +21,7 @@ import com.shoppinglist.shoppinglist.Services.JwtService;
 
 import java.util.Map;
 
-import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,9 +41,9 @@ public class AuthController {
 
     // Inscription d'un nouvel utilisateur
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserCreateDTO userDto) {
+    public ResponseEntity<String> register(@Valid @RequestBody UserCreateDTO userDto) {
         if (usersRepository.findByEmail(userDto.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Erreur : Cet email est déja utilisé !");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet email est déjà utilisé !");
         }
 
         User user = new User();
@@ -59,7 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody UserLoginDTO loginRequest) {
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserLoginDTO loginRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));

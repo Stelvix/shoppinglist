@@ -31,6 +31,8 @@ import org.springframework.security.core.Authentication;
 import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserResponseDTO;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -43,10 +45,11 @@ public class UsersController {
          * GET /api/users - Récupère tous les utilisateurs
          */
         @GetMapping
-        @Operation(summary = "Récupère tous les utilisateurs", description = "Retourne une liste de tous les utilisateurs enregistrés")
-        @ApiResponse(responseCode = "200", description = "Liste des utilisateurs récupérée avec succès", content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+        @Operation(summary = "Récupère tous les utilisateurs", description = "Désactivé pour des raisons de sécurité")
+        @ApiResponse(responseCode = "403", description = "Accès refusé à l'énumération globale des utilisateurs")
         public List<UserResponseDTO> getUsers() {
-                return usersServices.getAllUsers();
+                throw new org.springframework.web.server.ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "Accès refusé : L'énumération globale des utilisateurs est interdite pour des raisons de sécurité.");
         }
 
         /**
@@ -91,7 +94,7 @@ public class UsersController {
                         @ApiResponse(responseCode = "400", description = "Données invalides")
         })
         public ResponseEntity<UserResponseDTO> createUser(
-                        @RequestBody @Parameter(description = "Données de l'utilisateur à créer") UserCreateDTO userCreateDTO) {
+                        @Valid @RequestBody @Parameter(description = "Données de l'utilisateur à créer") UserCreateDTO userCreateDTO) {
                 UserResponseDTO savedUser = usersServices.createUser(userCreateDTO);
 
                 URI locationUri = ServletUriComponentsBuilder
@@ -118,7 +121,7 @@ public class UsersController {
         })
         public ResponseEntity<UserResponseDTO> updateUser(
                         @PathVariable UUID id,
-                        @RequestBody UserCreateDTO userCreateDTOdetails,
+                        @Valid @RequestBody UserCreateDTO userCreateDTOdetails,
                         Authentication authentication) {
                 UserResponseDTO currentUser = usersServices.getUserByEmail(authentication.getName());
                 if (!currentUser.getId().equals(id)) {

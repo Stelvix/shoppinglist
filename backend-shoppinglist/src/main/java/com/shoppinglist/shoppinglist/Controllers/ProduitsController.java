@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/produits")
 @RequiredArgsConstructor
@@ -75,7 +77,7 @@ public class ProduitsController {
         })
         public ResponseEntity<ProduitResponseDTO> createProduit(
                         @PathVariable UUID typeDeCourseId,
-                        @RequestBody @Parameter(description = "Données du produit à créer") ProduitCreateDTO produitCreateDTO,
+                        @Valid @RequestBody @Parameter(description = "Données du produit à créer") ProduitCreateDTO produitCreateDTO,
                         Authentication authentication) {
                 ProduitResponseDTO savedProduit = produitServices.CreateProduits(typeDeCourseId, produitCreateDTO, authentication.getName());
                 URI locationUri = ServletUriComponentsBuilder
@@ -100,7 +102,7 @@ public class ProduitsController {
         })
         public ResponseEntity<ProduitResponseDTO> updateProduit(
                         @PathVariable @Parameter(description = "ID du produit à mettre à jour") UUID id,
-                        @RequestBody @Parameter(description = "Nouvelles données du produit") ProduitCreateDTO produitDetails,
+                        @Valid @RequestBody @Parameter(description = "Nouvelles données du produit") ProduitCreateDTO produitDetails,
                         Authentication authentication) {
                 ProduitResponseDTO updateproduit = produitServices.updateProduit(produitDetails, id, authentication.getName());
                 return ResponseEntity.ok(updateproduit);
