@@ -46,7 +46,7 @@ export const authService = {
     });
 
     const token = response.data.token;
-    console.log('voici le token', token.toString())
+    //console.log('voici le token', token.toString())
 
     if (!token) {
       throw new Error('Token manquant dans la réponse serveur');
@@ -104,6 +104,9 @@ export const authService = {
    */
   logout(): void {
     localStorage.removeItem('token');
+    Object.keys(localStorage)
+      .filter(key => key.startsWith("purchased_"))
+      .forEach(key => localStorage.removeItem(key));
   },
 
   /**

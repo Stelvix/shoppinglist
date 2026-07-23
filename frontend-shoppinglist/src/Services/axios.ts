@@ -30,18 +30,24 @@ api.interceptors.response.use(
     
     const isAuthRoute = url?.includes('/auth/login') || url?.includes('/auth/register');
 
-    // Si on reçoit un 401 (Non autorisé) ou 403 (Interdit) sur une route protégée
-    if (!isAuthRoute && (status === 401 || status === 403)) {
-      // Nettoyage immédiat de la session
-      localStorage.removeItem('token');
-      localStorage.setItem('sessionExpired', 'true');
-      
-      // Redirection vers la page de connexion
-      // On utilise window.location pour forcer un reset complet de l'état React en cas de corruption de session
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+     // 401 -> Token invalide/expiré
+ if (!isAuthRoute && status === 401) {
+
+      console.warn("Session expirée.");
+
+      localStorage.removeItem("token");
+      localStorage.setItem("sessionExpired", "true");
+
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
       }
     }
+
+     // 403 -> Pas les permissions
+     if (!isAuthRoute && status === 403) {
+
+      console.warn("Accès refusé.");}
+
 
     return Promise.reject(error);
   }
