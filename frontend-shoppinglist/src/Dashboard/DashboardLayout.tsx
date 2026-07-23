@@ -56,18 +56,18 @@ export default function DashboardLayout() {
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="mt-3 text-3xl font-black tracking-tight">Tableau de bord</h1>
-              <p className="mt-2 text-sm text-textSecondary">Bienvenue, {user.pseudo}</p>
+              <p className="mt-2 text-sm text-textSecondary">Bienvenue, <span className='font-bold text-blue-600'>{user.pseudo}</span> </p>
             </div>
 
             <div className="flex flex-col items-start gap-3 sm:items-end">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="rounded-2xl bg-primary px-4 py-3 text-sm font-black text-white transition hover:bg-primaryDark"
+                className="rounded-2xl bg-danger px-4 py-3 text-sm font-black text-white transition hover:bg-red-700"
               >
                 Se déconnecter
               </button>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+              <span className="rounded-full bg-green-300 px-3 py-1 text-xs animate-pulse font-semibold text-green-900">
                 Connecté
               </span>
             </div>
@@ -102,13 +102,13 @@ export default function DashboardLayout() {
             <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
               <h2 className="text-lg font-black">À propos</h2>
               <p className="mt-3 text-sm leading-6 text-textSecondary">
-                Ce layout centralise l’espace après connexion. Utilise-le pour toutes les pages protégées.
+                Organisez vos <span className='font-semibold text-blue-600'>listes de courses simplement</span> et retrouvez tous vos produits au même endroit.
               </p>
             </div>
             <div className="rounded-3xl bg-white p-6 shadow-sm shadow-slate-200">
               <h2 className="text-lg font-black">Organisation</h2>
               <p className="mt-3 text-sm leading-6 text-textSecondary">
-                Un seul layout signifie moins de composants dupliqués et une navigation plus simple à maintenir.
+                Une <span className='text-blue-600 font-semibold'>interface claire</span>  qui regroupe <span className='text-blue-600 font-semibold'>toutes les fonctionnalités essentielles</span>  pour gérer vos listes de courses facilement.
               </p>
             </div>
           </aside>

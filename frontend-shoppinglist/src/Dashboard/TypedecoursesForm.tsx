@@ -1,12 +1,13 @@
-import { useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import type { User, TypeDeCourseCreateDTO } from '../types'
 import { TypeDeCourseFields } from '../Forms/typeDecourse'
 import { AiOutlineShoppingCart, AiFillFileText } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import typeDeCourseService from '../Services/Typesdecourses'
-
+ 
 const TypedecoursesForm = () => {
+  const navigateTo = useNavigate();
   const { user } = useOutletContext<{ user: User | null }>()
   const {
     register,
@@ -25,6 +26,9 @@ const TypedecoursesForm = () => {
         //console.log('Création type de course', payload)
         await typeDeCourseService.createTypedecourse(payload)
       toast.success('Type de course créé avec succès !')
+      setTimeout(() => {
+        navigateTo("/dashboard")
+      }, 1000);
       reset()
     } catch (error) {
       console.error('Erreur création type de course', error)
@@ -35,7 +39,7 @@ const TypedecoursesForm = () => {
   return (
     <div>
       <h2 className="text-xl font-black">Crée une nouvelle liste</h2>
-      <p className="mt-3 text-sm text-textSecondary">Bienvenue {user?.pseudo}, ici tu peux gérer tes courses.</p>
+      <p className="mt-3 text-sm text-textSecondary "><span className='font-bold text-blue-600'>{user?.pseudo}</span>, ici tu peux gérer tes courses.</p>
 
       <form className="mt-8 grid gap-4" onSubmit={handleSubmit(onSubmit)}>
         <TypeDeCourseFields

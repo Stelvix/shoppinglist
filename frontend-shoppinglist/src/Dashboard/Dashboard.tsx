@@ -44,19 +44,23 @@ const Dashboard = () => {
     const targetList = typesDeCourses.find((list) => list.id === id);
     const nombreProduit = targetList?.produits ? targetList.produits.length : 0;
 
-
-    console.log("targetList :", targetList);
-console.log("produits :", targetList?.produits);
-console.log("nombreProduit :", nombreProduit);
-
-
-    if (nombreProduit > 0) {
-      const confirmation = window.confirm(
+    if (nombreProduit) {
+      if (nombreProduit > 0) {
+         const confirmation = window.confirm(
         `Il reste ${nombreProduit} produit(s) dans la liste "${targetList?.name || ''}". Voulez-vous vraiment tout supprimer ?`
-      );
+        );
+              if (!confirmation) return;
 
-      if (!confirmation) return;
+      } else if (nombreProduit == 0) {
+      
+        const confirmation = window.confirm(
+          `Voullez vous vraimment supprimer la liste "${targetList?.name || ''}"?`
+        )
+        if (!confirmation) return;
+      }
+
     }
+
 
     try {
       await typeDeCourseService.deleteTypedecourse(id);
