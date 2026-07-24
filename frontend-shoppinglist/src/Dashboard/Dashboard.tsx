@@ -8,13 +8,24 @@ import {
   AiFillPlusCircle, 
   AiOutlineDelete, 
   AiOutlineEye, 
-  AiOutlineCalendar 
+  AiOutlineCalendar,
+  AiFillCalendar
 } from "react-icons/ai";
+import DatePicker, {registerLocale} from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { fr } from 'date-fns/locale/fr';
+
+registerLocale('fr', fr);
 
 const Dashboard = () => {
   const { user } = useOutletContext<{ user: User | null }>();
   const [typesDeCourses, setTypesDeCourses] = useState<TypeDeCourse[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<null | Date>(null);
+
+ 
+  
+  
 
   const refreshCourses = useCallback(async () => {
     if (!user) return;
@@ -39,6 +50,32 @@ const Dashboard = () => {
 
     loadCourses();
   }, [refreshCourses]);
+
+const handleDateChange = useCallback(async (date: Date | null) => {
+  setSelectedDate(date);
+  if (!user) return;
+
+   if (!date) {
+    refreshCourses();
+    return;
+  }
+  const formatedDate = `${date.toLocaleDateString('sv-SE')}`;
+  console.log("Voici la date rencoyée :", formatedDate);
+
+
+
+   setLoadingCourses(true);
+  try {
+    const data = await typeDeCourseService.getTypeDecoursesByDay(formatedDate);
+    setTypesDeCourses(data);
+  } catch (error) {
+    console.error("Erreur de filtrage", error);
+    toast.error("Impossible de filtrer par date.");
+  } finally {
+    setLoadingCourses(false);
+  }
+}, [user, refreshCourses]); 
+ 
 
   const handleDeleteList = async (id: string) => {
     const targetList = typesDeCourses.find((list) => list.id === id);
@@ -125,8 +162,35 @@ const Dashboard = () => {
 
       {/* Grille des listes */}
       <div className="space-y-4">
-        <h3 className="text-lg font-black text-textPrimary">Vos listes enregistrées</h3>
-        
+
+      <div className="mt-8">
+       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <h2 className="text-xl font-bold text-gray-900">
+          Vos listes enregistrées
+        </h2>
+
+            <div className="relative w-full sm:w-auto">
+
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none z-10">
+             <AiFillCalendar className="h-5 w-5 text-blue-600" />
+              </div>
+            
+           <DatePicker
+            selected={selectedDate}
+            onChange={handleDateChange}
+            dateFormat="dd/MM/yyyy"
+            placeholderText="Filtrer par date"
+            shouldCloseOnSelect={true}
+                isClearable
+                locale={"fr"}
+                
+            // Style Tailwind appliqué directement sur le champ de saisie
+            className="w-full sm:w-auto pl-10 px-4 py-2 text-sm text-blue-600 bg-white border border-blue-300 rounded-xl hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer"
+          />
+        </div>
+      </div>
+
+         
         {loadingCourses ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
@@ -170,18 +234,18 @@ const Dashboard = () => {
                 <div className="flex items-center gap-2 self-end sm:self-center">
                   <Link
                     to={`listes/${courseList.id}`}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-600 transition hover:bg-primary hover:text-white"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-slate-600 transition hover:bg-primary hover:text-white"
                     title="Voir les produits"
                   >
-                    <AiOutlineEye className="h-5 w-5" />
+                    <AiOutlineEye className="h-5 w-5 text-white" />
                   </Link>
                   <button
                     type="button"
                     onClick={() => handleDeleteList(courseList.id)}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-600 transition hover:bg-danger hover:text-white"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500 text-slate-600 transition hover:bg-red-700 hover:text-white"
                     title="Supprimer la liste"
                   >
-                    <AiOutlineDelete className="h-5 w-5" />
+                    <AiOutlineDelete className="h-5 w-5 text-white " />
                   </button>
                 </div>
               </div>
@@ -189,7 +253,8 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+      </div>
   );
 };
 
