@@ -19,9 +19,11 @@ import com.shoppinglist.shoppinglist.Dtos.TypeDeCourseResponseDTO;
 import com.shoppinglist.shoppinglist.Models.TypeDeCourse;
 
 import lombok.RequiredArgsConstructor;
+import java.security.Principal;
 
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -141,7 +143,8 @@ public class TypesCoursesController {
         public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByDate(
                         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date,
                         Authentication authentication) {
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesBySpecifiedDate(date, authentication.getName());
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesBySpecifiedDate(date,
+                                authentication.getName());
                 return ResponseEntity.ok(types);
         }
 
@@ -153,11 +156,13 @@ public class TypesCoursesController {
         @GetMapping("/by-day/{date}")
         @ApiResponse(responseCode = "200", description = "Type de courses récupéré avec succès", content = @Content(schema = @Schema(implementation = TypeDeCourse.class)))
         public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCoursesByDay(
-                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime date,
+                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                         Authentication authentication) {
 
-                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesByDay(date, authentication.getName());
-                return ResponseEntity.ok(types);
+                List<TypeDeCourseResponseDTO> types = typeCoursesServices.getTypeDeCoursesByDay(
+                                date,
+                                authentication.getName());
 
+                return ResponseEntity.ok(types);
         }
 }
