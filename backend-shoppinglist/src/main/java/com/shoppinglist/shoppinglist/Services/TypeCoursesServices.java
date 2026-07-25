@@ -3,6 +3,7 @@ package com.shoppinglist.shoppinglist.Services;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -130,7 +131,8 @@ public class TypeCoursesServices {
                 .toList(); // pour chaques type de courses on les map en DTO
     }
 
-    // récupérer une liste de type de courses en fonction d'une date précise pour l'utilisateur connecté
+    // récupérer une liste de type de courses en fonction d'une date précise pour
+    // l'utilisateur connecté
     public List<TypeDeCourseResponseDTO> getTypeDeCoursesBySpecifiedDate(OffsetDateTime date, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
@@ -144,31 +146,20 @@ public class TypeCoursesServices {
     }
 
     // get les types de courses par jour pour l'utilisateur connecté
-    public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(OffsetDateTime dateTime, String email) {
-        try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+    public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(LocalDate localDate, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
 
-            // 1. On extrait la date pure
-            LocalDate localDate = dateTime.toLocalDate();
+        // Création des bornes pour la journée
+        OffsetDateTime startOfDay = localDate.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+        OffsetDateTime endOfDay = localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-            // 2. Début de journée (00:00:00)
-            OffsetDateTime startOfDay = localDate.atStartOfDay().atOffset(ZoneOffset.UTC);
+        List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAtBetween(user.getId(), startOfDay,
+                endOfDay);
 
-            // 3. Fin de journée (23:59:59.999)
-            OffsetDateTime endOfDay = localDate.atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC);
-
-            // 4. Requête SQL automatique "BETWEEN"
-            List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAtBetween(user.getId(), startOfDay, endOfDay);
-
-            return types.stream()
-                    .map(this::convertTCourseResponseDTO)
-                    .toList();
-
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la récupération des types de courses par jour : " + e.getMessage());
-            return List.of();
-        }
+        return types.stream()
+                .map(this::convertTCourseResponseDTO)
+                .toList();
     }
 
     public List<TypeDeCourseResponseDTO> getTypeDeCourseByUserEmail(String email) {

@@ -12,6 +12,10 @@ target/
 .settings
 .springBeans
 .sts4-cache
+*.log
+*build_output*
+.idea/
+.vscode/
 
 ### IntelliJ IDEA ###
 .idea

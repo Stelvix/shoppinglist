@@ -14,8 +14,13 @@ const typeDeCourseService = {
     return data;
   },
 
+  async getTypeDecoursesByDay(date: string): Promise<TypeDeCourse[]>{
+    const { data } = await api.get<TypeDeCourse[]>(`/type_de_courses/by-day/${date}`)
+    return data;
+  },
+
   async createTypedecourse(TypeDeCourseCreateDTO: TypeDeCourseCreateDTO,): Promise<TypeDeCourse>{
-    const response = await api.post<TypeDeCourse>(`/type_de_courses/typedecourses`, {
+    const response = await api.post<TypeDeCourse>(`/type_de_courses`, {
       name: TypeDeCourseCreateDTO.name,
       description: TypeDeCourseCreateDTO.description
     });

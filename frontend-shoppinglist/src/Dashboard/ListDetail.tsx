@@ -85,7 +85,7 @@ const handleAddProduct = async (e: React.FormEvent) => {
       prix: Number(newProductPrice)
     });
 
-    setProducts(prev => [...prev, created]);
+    setProducts(ancienTableau => [...ancienTableau, created]);
 
     setNewProductName("");
     setNewProductPrice("");
@@ -105,8 +105,8 @@ const handleDeleteProduct = async (productId: string) => {
   try {
     await produitService.deleteProduit(productId);
 
-    setProducts(prev =>
-      prev.filter(product => product.id !== productId)
+    setProducts(ancienTableau =>
+      ancienTableau.filter(product => product.id !== productId)
     );
 
     toast.success("Produit supprimé !");
@@ -170,12 +170,12 @@ const handleDeleteProduct = async (productId: string) => {
         {/* Left Column: Form & Budget summary */}
         <div className="space-y-6 lg:col-span-1">
           {/* Budget Widget */}
-          <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-200">
+          <div className="rounded-3xl bg-slate-900 p-4  text-white shadow-xl shadow-slate-200">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Budget</h3>
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-300">Total estimé</span>
-                <span className="text-2xl font-black">{totalEstimated.toFixed(2)} €</span>
+                <span className="text-sm  text-slate-300">Total estimé: </span> 
+                <span className="text-xl font-black">{totalEstimated.toFixed(2)} €</span>
               </div>
               <div className="flex items-center justify-between border-t border-slate-800 pt-3">
                 <span className="text-sm text-slate-300">Total acheté</span>
@@ -189,7 +189,7 @@ const handleDeleteProduct = async (productId: string) => {
           </div>
 
           {/* Add product form */}
-          <div className="rounded-3xl border border-slate-150 bg-white p-6 shadow-sm">
+          <div className="rounded-3xl w-80 border border-slate-150 bg-white p-4 shadow-sm">
             <h3 className="text-lg font-black text-textPrimary">Ajouter un produit</h3>
             <form onSubmit={handleAddProduct} className="mt-4 space-y-4">
               <label className="grid gap-2">
