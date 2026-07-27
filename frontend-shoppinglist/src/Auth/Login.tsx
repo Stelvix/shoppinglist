@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { AuthField, Brand } from './AuthIcons'
 import { Link, useNavigate } from 'react-router-dom'
-import { AiOutlineMail, AiOutlineLock } from 'react-icons/ai'
+import { AiOutlineMail, AiOutlineLock, AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 import authService from '../Services/auth'
 
@@ -110,6 +110,7 @@ export default function Login() {
                 disabled={isSubmitting}
                 className="mt-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-black text-white shadow-sm shadow-blue-200 transition hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-70"
               >
+               {/*<AiOutlineLoading3Quarters /> */} 
                 Se connecter
               </button>
             </form>

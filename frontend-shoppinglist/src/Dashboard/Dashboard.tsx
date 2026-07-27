@@ -66,8 +66,9 @@ const handleDateChange = useCallback(async (date: Date | null) => {
 
    setLoadingCourses(true);
   try {
-    const data = await typeDeCourseService.getTypeDecoursesByDay(formatedDate);
+    const data = await typeDeCourseService.getTypeDecoursesByDay(formatedDate); 
     setTypesDeCourses(data);
+  
   } catch (error) {
     console.error("Erreur de filtrage", error);
     toast.error("Impossible de filtrer par date.");
@@ -75,6 +76,8 @@ const handleDateChange = useCallback(async (date: Date | null) => {
     setLoadingCourses(false);
   }
 }, [user, refreshCourses]); 
+  
+ // const toastMessage = toast.warning(`kpjgjejgpjg`);
  
 
   const handleDeleteList = async (id: string) => {
@@ -199,7 +202,7 @@ const handleDateChange = useCallback(async (date: Date | null) => {
           </div>
         ) : typesDeCourses.length === 0 ? (
           <div className="rounded-3xl border-2 border-dashed border-slate-200 p-8 text-center bg-white">
-            <p className="text-sm text-textSecondary">Aucune liste de course créée pour le moment.</p>
+            <p className="text-sm text-textSecondary">Aucune liste de course créée pour le moment. </p>
             <Link to="create-type-course" className="mt-3 inline-block text-sm font-bold text-primary hover:underline">
               Créez votre première liste de course
             </Link>
