@@ -16,6 +16,7 @@ target/
 *build_output*
 .idea/
 .vscode/
+.env
 
 ### IntelliJ IDEA ###
 .idea
