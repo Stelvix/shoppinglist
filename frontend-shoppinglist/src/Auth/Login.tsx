@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { AuthField, Brand } from './AuthIcons'
 import { Link, useNavigate } from 'react-router-dom'
-import { AiOutlineMail, AiOutlineLock, AiOutlineLoading3Quarters } from 'react-icons/ai'
+import { AiOutlineMail, AiOutlineLock } from 'react-icons/ai'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 import authService from '../Services/auth'
 
