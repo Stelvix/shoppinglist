@@ -1,11 +1,9 @@
 package com.shoppinglist.shoppinglist.Services;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,168 +26,158 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class TypeCoursesServices {
-    private final TypesCoursesRepository typesCoursesRepository;
-    private final UsersRepository userRepository;
+        private final TypesCoursesRepository typesCoursesRepository;
+        private final UsersRepository userRepository;
 
-    /**
-     * Récupère tous les types de courses
-     */
-    public List<TypeDeCourseResponseDTO> getAllTypeDeCourses() {
-        return typesCoursesRepository.findAll()
-                .stream()
-                .map(this::convertTCourseResponseDTO)
-                .toList();
-    }
-
-    /**
-     * Récupère un type de course par ID
-     */
-    public TypeDeCourseResponseDTO getTypeDeCourseById(UUID id, String email) {
-        TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Type de course non trouvé avec id : " + id));
-
-        // Vérification sécurisée avec trim() et ignoreCase
-        if (typeDeCourse.getUser() != null) {
-            String ownerEmail = typeDeCourse.getUser().getEmail();
-
-            if (ownerEmail == null || !ownerEmail.trim().equalsIgnoreCase(email.trim())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
-            }
+        /**
+         * Récupère tous les types de courses
+         */
+        public List<TypeDeCourseResponseDTO> getAllTypeDeCourses() {
+                return typesCoursesRepository.findAll()
+                                .stream()
+                                .map(this::convertTCourseResponseDTO)
+                                .toList();
         }
 
-        System.out.println(
-                "DEBUG - Email BDD: '" + typeDeCourse.getUser().getEmail() + "' | Email Token: '" + email + "'");
-        return convertTCourseResponseDTO(typeDeCourse);
-    }
+        /**
+         * Récupère un type de course par ID
+         */
+        public TypeDeCourseResponseDTO getTypeDeCourseById(UUID id, String email) {
+                TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Type de course non trouvé avec id : " + id));
 
-    /**
-     * Crée un nouveau type de course
-     */
-    public TypeDeCourseResponseDTO createTypeDeCourse(TypeDeCourseCreateDTO typeDeCourseDto, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+                // Vérification sécurisée avec trim() et ignoreCase
+                if (typeDeCourse.getUser() != null) {
+                        String ownerEmail = typeDeCourse.getUser().getEmail();
 
-        TypeDeCourse typeDeCourse = new TypeDeCourse();
-        typeDeCourse.setName(typeDeCourseDto.getName());
-        typeDeCourse.setDescription(typeDeCourseDto.getDescription());
-        typeDeCourse.setCreatedAt(OffsetDateTime.now());
-        typeDeCourse.setUser(user);
-
-        TypeDeCourse createdTypedeCourses = typesCoursesRepository.save(typeDeCourse);
-        return convertTCourseResponseDTO(createdTypedeCourses);
-    }
-
-    /**
-     * Met à jour un type de course existant
-     */
-    public TypeDeCourseResponseDTO updateTypeDeCourse(UUID id, TypeDeCourseCreateDTO typeDeCourseDetails,
-            String email) {
-        TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Type de course non trouvé"));
-
-        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+                        if (ownerEmail == null || !ownerEmail.trim().equalsIgnoreCase(email.trim())) {
+                                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+                        }
+                }
+                return convertTCourseResponseDTO(typeDeCourse);
         }
 
-        typeDeCourse.setName(typeDeCourseDetails.getName());
-        typeDeCourse.setDescription(typeDeCourseDetails.getDescription());
-        typeDeCourse.setUpdatedAt(OffsetDateTime.now());
+        /**
+         * Crée un nouveau type de course
+         */
+        public TypeDeCourseResponseDTO createTypeDeCourse(TypeDeCourseCreateDTO typeDeCourseDto, String email) {
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Utilisateur non trouvé"));
 
-        TypeDeCourse updatedTypeDeCourse = typesCoursesRepository.save(typeDeCourse);
-        return convertTCourseResponseDTO(updatedTypeDeCourse);
-    }
+                TypeDeCourse typeDeCourse = new TypeDeCourse();
+                typeDeCourse.setName(typeDeCourseDto.getName());
+                typeDeCourse.setDescription(typeDeCourseDto.getDescription());
+                typeDeCourse.setCreatedAt(OffsetDateTime.now());
+                typeDeCourse.setUser(user);
 
-    /**
-     * Supprime un type de course par ID
-     */
-    public void deleteTypeDeCourseById(UUID id, String email) {
-        TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Type de course non trouvé"));
-
-        if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
-        }
-        typesCoursesRepository.delete(typeDeCourse);
-    }
-
-    // service spécial
-    // Récuperer une liste de courses en fonction d'un utilisateur
-    public List<TypeDeCourseResponseDTO> getTypeDeCourseByuserId(UUID id, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
-        if (!user.getId().equals(id)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé");
+                TypeDeCourse createdTypedeCourses = typesCoursesRepository.save(typeDeCourse);
+                return convertTCourseResponseDTO(createdTypedeCourses);
         }
 
-        List<TypeDeCourse> types = typesCoursesRepository.findByUserId(id);
-        return types
-                .stream()
-                .map(this::convertTCourseResponseDTO)
-                .toList(); // pour chaques type de courses on les map en DTO
-    }
+        /**
+         * Met à jour un type de course existant
+         */
+        public TypeDeCourseResponseDTO updateTypeDeCourse(UUID id, TypeDeCourseCreateDTO typeDeCourseDetails,
+                        String email) {
+                TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Type de course non trouvé"));
 
-    // récupérer une liste de type de courses en fonction d'une date précise pour
-    // l'utilisateur connecté
-    public List<TypeDeCourseResponseDTO> getTypeDeCoursesBySpecifiedDate(OffsetDateTime date, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+                if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+                }
 
-        List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAt(user.getId(), date);
+                typeDeCourse.setName(typeDeCourseDetails.getName());
+                typeDeCourse.setDescription(typeDeCourseDetails.getDescription());
+                typeDeCourse.setUpdatedAt(OffsetDateTime.now());
 
-        return types
-                .stream()
-                .map(this::convertTCourseResponseDTO)
-                .toList();
-    }
+                TypeDeCourse updatedTypeDeCourse = typesCoursesRepository.save(typeDeCourse);
+                return convertTCourseResponseDTO(updatedTypeDeCourse);
+        }
 
-    // get les types de courses par jour pour l'utilisateur connecté
-    public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(LocalDate localDate, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+        /**
+         * Supprime un type de course par ID
+         */
+        public void deleteTypeDeCourseById(UUID id, String email) {
+                TypeDeCourse typeDeCourse = typesCoursesRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Type de course non trouvé"));
 
-        // Création des bornes pour la journée
-        OffsetDateTime startOfDay = localDate.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
-        OffsetDateTime endOfDay = localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toOffsetDateTime();
+                if (typeDeCourse.getUser() != null && !typeDeCourse.getUser().getEmail().equals(email)) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
+                }
+                typesCoursesRepository.delete(typeDeCourse);
+        }
 
-        List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAtBetween(user.getId(), startOfDay,
-                endOfDay);
+        // service spécial
+        // Récuperer une liste de courses en fonction d'un utilisateur
+        public List<TypeDeCourseResponseDTO> getTypeDeCourseByUserEmail(String email) {
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Utilisateur non trouvé"));
+                List<TypeDeCourse> types = typesCoursesRepository.findByUserId(user.getId());
+                return types.stream()
+                                .map(this::convertTCourseResponseDTO)
+                                .toList();
+        }
 
-        return types.stream()
-                .map(this::convertTCourseResponseDTO)
-                .toList();
-    }
+        // récupérer une liste de type de courses en fonction d'une date précise pour
+        // l'utilisateur connecté
+        public List<TypeDeCourseResponseDTO> getTypeDeCoursesBySpecifiedDate(OffsetDateTime date, String email) {
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Utilisateur non trouvé"));
 
-    public List<TypeDeCourseResponseDTO> getTypeDeCourseByUserEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
-        List<TypeDeCourse> types = typesCoursesRepository.findByUserId(user.getId());
-        return types.stream()
-                .map(this::convertTCourseResponseDTO)
-                .toList();
-    }
+                List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAt(user.getId(), date);
 
-    // Mapping du DTO
-    private TypeDeCourseResponseDTO convertTCourseResponseDTO(TypeDeCourse typeDeCourse) {
+                return types
+                                .stream()
+                                .map(this::convertTCourseResponseDTO)
+                                .toList();
+        }
 
-        List<ProduitResponseDTO> produits = typeDeCourse.getProduits()
-                .stream()
-                .map(produit -> new ProduitResponseDTO(
-                        produit.getId(),
-                        produit.getName(),
-                        produit.getPrix(),
-                        produit.getCreatedAt(),
-                        produit.getUpdatedAt()))
-                .toList();
+        // get les types de courses par jour pour l'utilisateur connecté
+        public List<TypeDeCourseResponseDTO> getTypeDeCoursesByDay(LocalDate localDate, String email) {
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "Utilisateur non trouvé"));
 
-        return new TypeDeCourseResponseDTO(
-                typeDeCourse.getId(),
-                typeDeCourse.getName(),
-                typeDeCourse.getDescription(),
-                typeDeCourse.getCreatedAt(),
-                typeDeCourse.getUpdatedAt(),
-                produits);
-    }
+                // Création des bornes pour la journée
+                OffsetDateTime startOfDay = localDate.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+                OffsetDateTime endOfDay = localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault())
+                                .toOffsetDateTime();
+
+                List<TypeDeCourse> types = typesCoursesRepository.findByUserIdAndCreatedAtBetween(user.getId(),
+                                startOfDay,
+                                endOfDay);
+
+                return types.stream()
+                                .map(this::convertTCourseResponseDTO)
+                                .toList();
+        }
+
+        // Mapping du DTO
+        private TypeDeCourseResponseDTO convertTCourseResponseDTO(TypeDeCourse typeDeCourse) {
+
+                List<ProduitResponseDTO> produits = typeDeCourse.getProduits()
+                                .stream()
+                                .map(produit -> new ProduitResponseDTO(
+                                                produit.getId(),
+                                                produit.getName(),
+                                                produit.getPrix(),
+                                                produit.getCreatedAt(),
+                                                produit.getUpdatedAt()))
+                                .toList();
+
+                return new TypeDeCourseResponseDTO(
+                                typeDeCourse.getId(),
+                                typeDeCourse.getName(),
+                                typeDeCourse.getDescription(),
+                                typeDeCourse.getCreatedAt(),
+                                typeDeCourse.getUpdatedAt(),
+                                produits);
+        }
+
 }

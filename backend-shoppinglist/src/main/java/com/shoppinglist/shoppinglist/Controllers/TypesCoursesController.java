@@ -129,7 +129,8 @@ public class TypesCoursesController {
          * ENDPOINT SPECIAL POUR RENVOYER LES LISTES DE COURSES EN FONCTION DU USER
          */
         @GetMapping("/user")
-        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserId(Authentication authentication) {
+        public ResponseEntity<List<TypeDeCourseResponseDTO>> getTypesCouresesByUserEmail(
+                        Authentication authentication) {
                 List<TypeDeCourseResponseDTO> types = typeCoursesServices
                                 .getTypeDeCourseByUserEmail(authentication.getName());
                 return ResponseEntity.ok(types);
