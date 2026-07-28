@@ -60,7 +60,7 @@ const handleDateChange = useCallback(async (date: Date | null) => {
     return;
   }
   const formatedDate = `${date.toLocaleDateString('sv-SE')}`;
-  console.log("Voici la date rencoyée :", formatedDate);
+  // console.log("Voici la date rencoyée :", formatedDate);
 
 
 

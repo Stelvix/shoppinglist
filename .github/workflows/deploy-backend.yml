@@ -1,4 +1,4 @@
-name: Buil and Deploy Spring Boot to Azure
+name: Build and Deploy Spring Boot to Azure
 
 on:
     push:
@@ -6,6 +6,7 @@ on:
             - master
         paths:
             - 'backend-shoppinglist/**'
+
 env:
     AZURE_WEBAPP_NAME: 'MyShoppingListapi'
     WORKING_DIRECTORY: 'backend-shoppinglist'
@@ -15,11 +16,9 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            # recupe du code du repo git
             - name: Checkout Github Actions
               uses: actions/checkout@v4
 
-            #installation de java 21 sur la vm 
             - name: Set up Java 21
               uses: actions/setup-java@v4
               with:
@@ -27,19 +26,13 @@ jobs:
                   distribution: 'temurin'
                   cache: 'maven'
 
-            # compilation
             - name: Build with Maven
               run: mvn clean package -Dmaven.test.skip=true
-              working-directory: ${{env.WORKING_DIRECTORY}}
-              env:
-                SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
-                SPRING_DATASOURCE_USERNAME: sa
-                SPRING_DATASOURCE_PASSWORD: ""
-            
-            # Envoie du fichier .jar sur Azure
+              working-directory: ${{ env.WORKING_DIRECTORY }}
+
             - name: Deploy to Azure Web App
               uses: azure/webapps-deploy@v3
               with:
-                                    app-name: ${{ env.AZURE_WEBAPP_NAME }}
-                                    publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-                                    package: '${{ env.WORKING_DIRECTORY }}/target/*.jar'
+                  app-name: ${{ env.AZURE_WEBAPP_NAME }}
+                  publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+                  package: '${{ env.WORKING_DIRECTORY }}/target/*.jar'
