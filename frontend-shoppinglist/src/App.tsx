@@ -7,6 +7,7 @@ import ListDetail from './Dashboard/ListDetail'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Analytics} from '@vercel/analytics/react'
 
 function App(){
   return (
@@ -28,6 +29,8 @@ function App(){
         autoClose={4000} 
         theme="colored" 
       />
+
+      <Analytics/>
     </BrowserRouter>
   )
 }
