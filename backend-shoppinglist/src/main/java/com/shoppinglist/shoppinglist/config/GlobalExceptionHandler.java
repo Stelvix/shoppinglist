@@ -16,7 +16,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     /**
-     * Gère les erreurs de validation des champs DTOs (@Valid / @NotBlank / @Email / etc.)
+     * Gère les erreurs de validation des champs DTOs (@Valid / @NotBlank / @Email /
+     * etc.)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -36,7 +37,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Gère les ResponseStatusException (404 NOT_FOUND, 403 FORBIDDEN, 401 UNAUTHORIZED, etc.)
+     * Gère les ResponseStatusException (404 NOT_FOUND, 403 FORBIDDEN, 401
+     * UNAUTHORIZED, etc.)
      */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException ex) {
@@ -50,7 +52,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Gère toutes les autres exceptions inattendues pour éviter de fuiter des stack traces
+     * Gère toutes les autres exceptions inattendues pour éviter de fuiter des stack
+     * traces
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex) {
