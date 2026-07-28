@@ -30,7 +30,10 @@ export default function Login() {
     const sessionExpired = localStorage.getItem('sessionExpired')
     if (sessionExpired) {
       toast.error("La session a expiré. Veuillez vous reconnecter.")
-      localStorage.removeItem('sessionExpired')
+      localStorage.removeItem('sessionExpired');
+       Object.keys(localStorage)
+      .filter(key => key.startsWith("token"))
+      .forEach(key => localStorage.removeItem(key));
     }
   }, [])
 
