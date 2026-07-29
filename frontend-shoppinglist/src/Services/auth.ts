@@ -115,7 +115,8 @@ export const authService = {
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
     return isTokenValid(token);
-  }
+  },
+
 };
 
 export default authService;

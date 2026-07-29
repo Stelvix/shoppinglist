@@ -4,6 +4,9 @@ import Dashboard from './Dashboard/Dashboard'
 import DashboardLayout from './Dashboard/DashboardLayout'
 import TypedecoursesForm from './Dashboard/TypedecoursesForm'
 import ListDetail from './Dashboard/ListDetail'
+import MentionsLegales from './legal/MentionsLegales'
+import Confidentialite from './legal/Confidentialite'
+import Contact from './legal/Contact'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,6 +19,9 @@ function App(){
         <Route path="/" element={<Landing />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/mentions-legales" element={<MentionsLegales />} />
+        <Route path="/confidentialite" element={<Confidentialite />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="create-type-course" element={<TypedecoursesForm />} />

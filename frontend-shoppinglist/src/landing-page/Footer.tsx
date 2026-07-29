@@ -1,4 +1,5 @@
 import { AiOutlineShoppingCart } from 'react-icons/ai'
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
@@ -13,9 +14,9 @@ export default function Footer() {
 
 
         <div className="flex gap-5">
-          <a href="#" className="transition hover:text-textPrimary">Mentions legales</a>
-          <a href="#" className="transition hover:text-textPrimary">Confidentialite</a>
-          <a href="#" className="transition hover:text-textPrimary">Contact</a>
+          <Link to="/mentions-legales" className="transition hover:text-textPrimary">Mentions legales</Link>
+          <Link to="/confidentialite" className="transition hover:text-textPrimary">Confidentialite</Link>
+          <Link to="/contact" className="transition hover:text-textPrimary">Contact</Link>
         </div>
       </div>
     </footer>

@@ -4,6 +4,7 @@ export interface User {
   lname: string;     
   pseudo: string;
   email: string;
+  role: 'USER';
   createdAt?: string;
   updatedAt?: string;
 }
