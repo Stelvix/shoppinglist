@@ -63,7 +63,7 @@ export default function Contact() {
     setSending(true)
 
     const cleanName = sanitize(name.trim())
-    const cleanEmail = sanitize(email.trim())
+    //const cleanEmail = sanitize(email.trim())
     const cleanMsg = sanitize(message.trim())
     const subjectLabel =
       SUBJECTS.find((s) => s.value === subject)?.label ?? 'Contact'
