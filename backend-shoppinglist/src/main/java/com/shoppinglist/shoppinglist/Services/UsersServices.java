@@ -95,8 +95,6 @@ public class UsersServices {
         return convertToResponseDTO(user);
     }
 
-
-
     // Mapping du DTO: Conversion des entités en DTO
     private UserResponseDTO convertToResponseDTO(User user) {
         return new UserResponseDTO(
