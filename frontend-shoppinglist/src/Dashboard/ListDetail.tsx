@@ -6,7 +6,7 @@ import {
   AiOutlineShoppingCart, 
   AiOutlinePlus, 
   AiOutlineDelete, 
-  AiOutlineCheck, 
+  AiOutlineCheck,  
   AiOutlineLoading3Quarters 
 } from "react-icons/ai";
 import typeDeCourseService from "../Services/Typesdecourses";
@@ -71,6 +71,56 @@ const togglePurchased = (productId: string) => {
     );
   }
 };
+  
+  const updateProductName = async (
+    id: string,
+    name: string | null
+  ) => {
+
+    const newName = name?.trim();
+    
+
+    const product = products.find(p => p.id === id);
+    if (!product || !newName || newName === product.name) return;
+       
+    const dtoNewProduct = {
+      name: newName,
+      prix: product.prix
+    };
+
+    try {
+      const updateProduct = await produitService.updateProduit(id, dtoNewProduct);
+
+      setProducts(ancienTableau => ancienTableau.map(product => product.id === id ? updateProduct : product))
+      toast.success("Nom modifié!")
+    } catch (error) {
+      console.error(error);
+      toast.error("Impossible de modifier le nom de ce produit.")
+    }
+  };
+
+    const updateProductPrice = async (
+    id: string,
+    prix: number
+  ) => {
+    const product = products.find(p => p.id === id);
+
+    if (!product || isNaN(prix) || prix === product.prix) return;
+       
+    const dtoNewProduct = {
+      name: product.name,
+      prix: prix    };
+
+    try {
+      const updateProduct = await produitService.updateProduit(id, dtoNewProduct);
+
+      setProducts(ancienTableau => ancienTableau.map(product => product.id === id ? updateProduct : product))
+      toast.success("Prix modifié!")
+    } catch (error) {
+      console.error(error);
+      toast.error("Impossible de modifier le prix de ce produit.")
+    }
+  };
 
 const handleAddProduct = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -267,26 +317,41 @@ const handleDeleteProduct = async (productId: string) => {
                       </button>
                       
                       {/* Name */}
-                      <span 
-                        className={`truncate text-sm font-semibold transition-all ${
-                          isPurchased 
-                            ? "text-slate-400 line-through" 
-                            : "text-textPrimary"
-                        }`}
-                      >
-                        {product.name}
-                      </span>
+                    <span
+  contentEditable
+  suppressContentEditableWarning
+  onBlur={(e) => updateProductName(product.id, e.currentTarget.textContent)}
+  className={`outline-none px-2 focus:bg-blue-100 rounded-2xl text-sm font-semibold transition-all ${
+    isPurchased 
+      ? "text-slate-400 line-through" 
+      : "text-textPrimary"
+  }`}
+>
+  {product.name}
+</span>
                     </div>
 
                     <div className="flex items-center gap-4">
                       {/* Price */}
-                      <span 
-                        className={`text-sm font-bold transition-all ${
-                          isPurchased ? "text-slate-400" : "text-textPrimary"
-                        }`}
-                      >
-                        {Number(product.prix).toFixed(2)} €
-                      </span>
+                    <span 
+  contentEditable
+  suppressContentEditableWarning
+  onBlur={(e) =>
+    updateProductPrice(
+      product.id,
+      Number(e.currentTarget.textContent)
+    )
+  }
+  className={`text-sm font-bold transition-all outline-none px-2 focus:bg-blue-100 rounded-2xl ${
+    isPurchased ? "text-slate-400" : "text-textPrimary"
+  }`}
+>
+  {Number(product.prix).toFixed(2)}
+</span>
+
+<span className="text-sm font-bold">
+  €
+</span>
 
                       {/* Delete */}
                       <button

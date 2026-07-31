@@ -3,7 +3,6 @@ import { Navigate, Outlet, useNavigate, useLocation, Link, } from 'react-router-
 import authService from '../Services/auth'
 import type { User } from '../types'
 
-
 const navigation = [
   { label: 'Mes listes', key: 'dashboard', href: '/dashboard' },
   { label: 'Créer une liste', key: 'create-list', href: '/dashboard/create-type-course' },
