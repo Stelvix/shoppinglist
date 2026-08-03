@@ -21,7 +21,7 @@ public class CurrencyService {
 
         public CurrencyService(RestClient.Builder builder) {
                 this.restClient = builder
-                                .baseUrl("https://api.frankfurter.app")
+                                .baseUrl("https://open.er-api.com/v6")
                                 .build();
         }
 
@@ -56,9 +56,8 @@ public class CurrencyService {
 
         private BigDecimal fetchRate(Currency from, Currency to) {
                 ExchangeRateResponse response = restClient.get()
-                                .uri("/latest?from={from}&to={to}",
-                                                from.getCurrencyCode(),
-                                                to.getCurrencyCode())
+                                .uri("/latest/{from}",
+                                                from.getCurrencyCode())
                                 .retrieve()
                                 .body(ExchangeRateResponse.class);
 
