@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.OffsetDateTime;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class TypeCoursesServices {
         private final TypesCoursesRepository typesCoursesRepository;
         private final UsersRepository userRepository;
+        private final ProduitServices produitServices;
 
         /**
          * Récupère tous les types de courses
@@ -161,14 +163,15 @@ public class TypeCoursesServices {
         // Mapping du DTO
         private TypeDeCourseResponseDTO convertTCourseResponseDTO(TypeDeCourse typeDeCourse) {
 
+                Currency targetCurrency = typeDeCourse.getUser() != null
+                                ? typeDeCourse.getUser().getCurrency()
+                                : Currency.getInstance("EUR");
+
                 List<ProduitResponseDTO> produits = typeDeCourse.getProduits()
                                 .stream()
-                                .map(produit -> new ProduitResponseDTO(
-                                                produit.getId(),
-                                                produit.getName(),
-                                                produit.getPrix(),
-                                                produit.getCreatedAt(),
-                                                produit.getUpdatedAt()))
+                                .map(produit -> produitServices.toResponseDTO(
+                                                produit,
+                                                targetCurrency))
                                 .toList();
 
                 return new TypeDeCourseResponseDTO(

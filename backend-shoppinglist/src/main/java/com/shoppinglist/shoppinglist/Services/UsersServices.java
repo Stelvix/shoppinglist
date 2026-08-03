@@ -1,6 +1,7 @@
 package com.shoppinglist.shoppinglist.Services;
 
 import java.time.OffsetDateTime;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import com.shoppinglist.shoppinglist.Repository.UsersRepository;
 import com.shoppinglist.shoppinglist.Models.User;
 import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserResponseDTO;
+import com.shoppinglist.shoppinglist.Dtos.CurrencyDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +31,46 @@ public class UsersServices {
                 .stream()
                 .map(this::convertToResponseDTO)
                 .toList();
+    }
+
+    // service get toutes currencies pouřle selecty dans le front
+    public List<CurrencyDTO> getCurrencies() {
+        return Currency.getAvailableCurrencies()
+                .stream()
+                .map(
+                        currency -> new CurrencyDTO(
+                                currency.getCurrencyCode(),
+                                currency.getDisplayName(),
+                                currency.getSymbol()))
+                .toList();
+    }
+
+    public Currency getUserCurrency(String email) {
+        return usersRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Utilisateur non trouvé"))
+                .getCurrency();
+    }
+
+    public UserResponseDTO updateUserCurrency(String email, String code) {
+        Currency currency;
+        try {
+            currency = Currency.getInstance(code);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Devise invalide : " + code);
+        }
+
+        User user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Utilisateur non trouvé"));
+
+        user.setCurrency(currency);
+        User updatedUser = usersRepository.save(user);
+        return convertToResponseDTO(updatedUser);
     }
 
     // GET BY ID
@@ -102,6 +144,7 @@ public class UsersServices {
                 user.getName(),
                 user.getLname(),
                 user.getPseudo(),
-                user.getEmail());
+                user.getEmail(),
+                user.getCurrency());
     }
 }
