@@ -43,15 +43,16 @@ export default function Login() {
     //  await authService.getCurrentUser();
       toast.success('Connexion réussie!!');
       navigate('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Erreur : ', error);
 
-      const statusCode = error?.response?.status;
-      const errorMessage = error?.response?.data?.message ?? error?.message ?? 'Erreur de connexion';
+      const err = error as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      const statusCode = err?.response?.status;
+      const errorMessage = err?.response?.data?.message ?? err?.message ?? 'Erreur de connexion';
 
-      if (error?.message === 'Utilisateur connecté introuvable. Veuillez vous reconnecter.') {
+      if (err?.message === 'Utilisateur connecté introuvable. Veuillez vous reconnecter.') {
         authService.logout();
-        toast.error(error.message);
+        toast.error(err.message);
       } else if (statusCode === 401 || statusCode === 403) {
         toast.error('Email ou mot de passe incorrect.');
       } else {

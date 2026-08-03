@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 import { 
   AiOutlineArrowLeft, 
@@ -7,15 +7,20 @@ import {
   AiOutlinePlus, 
   AiOutlineDelete, 
   AiOutlineCheck,  
-  AiOutlineLoading3Quarters 
+  AiOutlineLoading3Quarters,
+  AiOutlineTag,
+  AiFillMoneyCollect
 } from "react-icons/ai";
 import typeDeCourseService from "../Services/Typesdecourses";
 import produitService from "../Services/produits";
-import type { TypeDeCourse, Produit } from "../types";
+import type { TypeDeCourse, Produit, User } from "../types";
+import { getCurrencyMeta } from "../utils/currency";
 
 export default function ListDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useOutletContext<{ user: User | null }>();
+  const currencySymbol = user?.currency ? getCurrencyMeta(user.currency).symbol : "€";
   
   const [list, setList] = useState<TypeDeCourse | null>(null);
   const [products, setProducts] = useState<Produit[]>([]);
@@ -172,6 +177,7 @@ const handleDeleteProduct = async (productId: string) => {
   const totalPurchased = products
     .filter((p) => purchasedIds.includes(p.id))
     .reduce((sum, p) => sum + Number(p.prix), 0);
+  const progressPercent = totalEstimated > 0 ? Math.round((totalPurchased / totalEstimated) * 100) : 0;
 
   if (loading) {
     return (
@@ -185,190 +191,198 @@ const handleDeleteProduct = async (productId: string) => {
   if (!list) return null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-32">
       {/* Header / Back navigation */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <Link 
-          to="/dashboard" 
-          className="inline-flex items-center gap-2 text-sm font-bold text-textSecondary transition hover:text-primary"
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-textSecondary shadow-sm transition hover:border-primary hover:text-primary"
         >
-          <AiOutlineArrowLeft className="h-5 w-5" />
+          <AiOutlineArrowLeft className="h-4 w-4" />
           Retour au tableau de bord
         </Link>
-        <span className="text-xs text-textSecondary">
+        <span className="text-xs font-semibold text-textSecondary">
           Créée le {new Date(list.createdAt).toLocaleDateString("fr-FR")}
         </span>
       </div>
 
       {/* Info card */}
-      <div className="rounded-3xl border border-slate-100 bg-slate-50 p-6">
-        <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-primary">
-            <AiOutlineShoppingCart className="h-6 w-6" />
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-blue-700 p-6 text-white shadow-lg shadow-blue-100 sm:p-8">
+        <div className="absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/10" />
+        <div className="absolute -bottom-16 right-28 h-40 w-40 rounded-full bg-white/5" />
+        <div className="relative flex items-center gap-4">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+            <AiOutlineShoppingCart className="h-7 w-7" />
           </span>
-          <div>
-            <h2 className="text-2xl font-black text-textPrimary">{list.name}</h2>
+          <div className="min-w-0">
+            <h2 className="truncate text-2xl font-black tracking-tight sm:text-3xl">{list.name}</h2>
             {list.description && (
-              <p className="mt-1 text-sm text-textSecondary">{list.description}</p>
+              <p className="mt-1 truncate text-sm text-blue-100">{list.description}</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Grid: Form on the left/top, Products on the right/bottom */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left Column: Form & Budget summary */}
-        <div className="space-y-6 lg:col-span-1">
-          {/* Budget Widget */}
-          <div className="rounded-3xl bg-slate-900 p-4  text-white shadow-xl shadow-slate-200">
+      {/* Budget summary */}
+      <div className="rounded-3xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-200 sm:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+          <div className="flex items-center gap-3">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Budget</h3>
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm  text-slate-300">Total estimé: </span> 
-                <span className="text-xl font-black">{totalEstimated.toFixed(2)} €</span>
-              </div>
-              <div className="flex items-center justify-between border-t border-slate-800 pt-3">
-                <span className="text-sm text-slate-300">Total acheté</span>
-                <span className="text-xl font-bold text-green-400">{totalPurchased.toFixed(2)} €</span>
-              </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>Reste à acheter</span>
-                <span>{(totalEstimated - totalPurchased).toFixed(2)} €</span>
-              </div>
-            </div>
+            <span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-bold text-white">
+              {progressPercent}% acheté
+            </span>
           </div>
-
-          {/* Add product form */}
-          <div className="rounded-3xl w-80 border border-slate-150 bg-white p-4 shadow-sm">
-            <h3 className="text-lg font-black text-textPrimary">Ajouter un produit</h3>
-            <form onSubmit={handleAddProduct} className="mt-4 space-y-4">
-              <label className="grid gap-2">
-                <span className="text-xs font-bold text-textPrimary">Nom du produit</span>
-                <input
-                  type="text"
-                  placeholder="Ex: Lait demi-écrémé"
-                  value={newProductName}
-                  onChange={(e) => setNewProductName(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-3 text-sm text-textPrimary outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
-                />
-              </label>
-              <label className="grid gap-2">
-                <span className="text-xs font-bold text-textPrimary">Prix (€)</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="Ex: 1.25"
-                  value={newProductPrice}
-                  onChange={(e) => setNewProductPrice(e.target.value)}
-                  className="rounded-xl border border-slate-200 px-3 py-3 text-sm text-textPrimary outline-none focus:border-primary focus:ring-4 focus:ring-blue-100"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition hover:bg-primaryDark disabled:opacity-50"
-              >
-                <AiOutlinePlus className="h-4 w-4" />
-                {submitting ? "Ajout..." : "Ajouter à la liste"}
-              </button>
-            </form>
+          <div className="flex flex-wrap items-center gap-x-10 gap-y-3">
+            <div>
+              <p className="text-xs text-slate-400">Estimé</p>
+              <p className="text-xl font-black text-white">{totalEstimated.toFixed(2)} {currencySymbol}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Acheté</p>
+              <p className="text-xl font-bold text-green-400">{totalPurchased.toFixed(2)} {currencySymbol}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Reste</p>
+              <p className="text-xl font-bold text-white">{(totalEstimated - totalPurchased).toFixed(2)} {currencySymbol}</p>
+            </div>
           </div>
         </div>
-
-        {/* Right Column: Products List */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black text-textPrimary">
-              Articles dans la liste ({products.length})
-            </h3>
-          </div>
-
-          {products.length === 0 ? (
-            <div className="rounded-3xl border-2 border-dashed border-slate-200 p-8 text-center">
-              <p className="text-sm text-textSecondary">Aucun produit dans cette liste pour l'instant.</p>
-              <p className="mt-1 text-xs text-textSecondary">Saisissez un article sur la gauche pour commencer.</p>
-            </div>
-          ) : (
-            <div className="grid gap-3">
-              {products.map((product) => {
-                const isPurchased = purchasedIds.includes(product.id);
-                return (
-                  <div
-                    key={product.id}
-                    className={`flex items-center justify-between rounded-2xl border p-4 transition duration-200 ${
-                      isPurchased 
-                        ? "border-green-100 bg-green-50/50" 
-                        : "border-slate-100 bg-white hover:border-slate-200"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* Checkbox */}
-                      <button
-                        type="button"
-                        onClick={() => togglePurchased(product.id)}
-                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition ${
-                          isPurchased
-                            ? "border-green-600 bg-green-600 text-white"
-                            : "border-slate-300 bg-white hover:border-primary"
-                        }`}
-                      >
-                        {isPurchased && <AiOutlineCheck className="h-4 w-4" />}
-                      </button>
-                      
-                      {/* Name */}
-                    <span
-  contentEditable
-  suppressContentEditableWarning
-  onBlur={(e) => updateProductName(product.id, e.currentTarget.textContent)}
-  className={`outline-none px-2 focus:bg-blue-100 rounded-2xl text-sm font-semibold transition-all ${
-    isPurchased 
-      ? "text-slate-400 line-through" 
-      : "text-textPrimary"
-  }`}
->
-  {product.name}
-</span>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      {/* Price */}
-                    <span 
-  contentEditable
-  suppressContentEditableWarning
-  onBlur={(e) =>
-    updateProductPrice(
-      product.id,
-      Number(e.currentTarget.textContent)
-    )
-  }
-  className={`text-sm font-bold transition-all outline-none px-2 focus:bg-blue-100 rounded-2xl ${
-    isPurchased ? "text-slate-400" : "text-textPrimary"
-  }`}
->
-  {Number(product.prix).toFixed(2)}
-</span>
-
-<span className="text-sm font-bold">
-  €
-</span>
-
-                      {/* Delete */}
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="text-slate-400 transition hover:text-danger"
-                      >
-                        <AiOutlineDelete className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+        <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-700">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
+
+      {/* Products List */}
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-black text-textPrimary">
+            Articles dans la liste
+          </h3>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+            {products.length} produit{products.length > 1 ? "s" : ""}
+          </span>
+        </div>
+
+        {products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-10 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-slate-300 shadow-sm">
+              <AiOutlineShoppingCart className="h-7 w-7" />
+            </span>
+            <p className="mt-4 text-sm font-semibold text-textPrimary">Aucun produit pour l'instant</p>
+            <p className="mt-1 text-xs text-textSecondary">Utilisez la barre ci-dessous pour ajouter votre premier article.</p>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {products.map((product) => {
+              const isPurchased = purchasedIds.includes(product.id);
+              return (
+                <div
+                  key={product.id}
+                  className={`grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-4 rounded-2xl border p-4 transition duration-200 sm:gap-5 sm:p-5 ${
+                    isPurchased 
+                      ? "border-green-100 bg-green-50/50" 
+                      : "border-slate-100 bg-white shadow-sm hover:border-slate-200 hover:shadow-md"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => togglePurchased(product.id)}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition ${
+                      isPurchased
+                        ? "border-green-600 bg-green-600 text-white"
+                        : "border-slate-300 bg-white hover:border-primary"
+                    }`}
+                  >
+                    {isPurchased && <AiOutlineCheck className="h-4 w-4" />}
+                  </button>
+
+                  <span
+                    contentEditable
+                    suppressContentEditableWarning
+                    onBlur={(e) => updateProductName(product.id, e.currentTarget.textContent)}
+                    className={`min-w-0 truncate rounded-2xl px-2 text-sm font-semibold outline-none transition-all focus:bg-blue-100 ${
+                      isPurchased 
+                        ? "text-slate-400 line-through" 
+                        : "text-textPrimary"
+                    }`}
+                  >
+                    {product.name}
+                  </span>
+
+                  <div className="flex items-baseline gap-1 whitespace-nowrap">
+                    <span
+                      contentEditable
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        updateProductPrice(
+                          product.id,
+                          Number(e.currentTarget.textContent)
+                        )
+                      }
+                      className={`rounded-2xl px-2 text-sm font-black outline-none transition-all focus:bg-blue-100 ${
+                        isPurchased ? "text-slate-400" : "text-textPrimary"
+                      }`}
+                    >
+                      {Number(product.prix).toFixed(2)}
+                    </span>
+                    <span className="text-xs font-bold text-textSecondary">
+                      {currencySymbol}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="shrink-0 text-slate-400 transition hover:text-danger"
+                  >
+                    <AiOutlineDelete className="h-5 w-5" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Sticky add product bar */}
+      <form
+        onSubmit={handleAddProduct}
+        className="sticky bottom-4 z-10 flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-300 sm:flex-row sm:items-center"
+      >
+        <div className="relative flex-1">
+          <AiOutlineTag className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Nom du produit"
+            value={newProductName}
+            onChange={(e) => setNewProductName(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-sm text-textPrimary outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-100"
+          />
+        </div>
+        <div className="relative w-full sm:w-44">
+          <AiFillMoneyCollect className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder={`Prix (${currencySymbol})`}
+            value={newProductPrice}
+            onChange={(e) => setNewProductPrice(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-sm text-textPrimary outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-blue-100"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-sm shadow-blue-200 transition hover:bg-primaryDark disabled:opacity-50"
+        >
+          <AiOutlinePlus className="h-4 w-4" />
+          {submitting ? "Ajout..." : "Ajouter"}
+        </button>
+      </form>
     </div>
   );
 }

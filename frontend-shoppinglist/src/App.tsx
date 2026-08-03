@@ -6,6 +6,7 @@ import TypedecoursesForm from './Dashboard/TypedecoursesForm'
 import ListDetail from './Dashboard/ListDetail'
 import MentionsLegales from './legal/MentionsLegales'
 import Confidentialite from './legal/Confidentialite'
+import Profil from './Dashboard/Profil'
 import Contact from './legal/Contact'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
@@ -26,6 +27,7 @@ function App(){
           <Route index element={<Dashboard />} />
           <Route path="create-type-course" element={<TypedecoursesForm />} />
           <Route path="listes/:id" element={<ListDetail />} />
+          <Route path="profil" element={<Profil />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
