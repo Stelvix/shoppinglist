@@ -9,10 +9,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.shoppinglist.shoppinglist.Converter.CurrencyConverter;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.UUID;
 
 @Getter
@@ -47,6 +49,10 @@ public class User implements UserDetails {
 
     @Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
     private String email;
+
+    @Convert(converter = CurrencyConverter.class)
+    @Column(name = "currency", nullable = false, length = 3, columnDefinition = "varchar(3) default 'EUR'")
+    private Currency currency = Currency.getInstance("EUR");
 
     @JsonIgnore
     @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)

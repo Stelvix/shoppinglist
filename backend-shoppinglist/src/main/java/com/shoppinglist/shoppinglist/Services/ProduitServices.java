@@ -1,10 +1,11 @@
 package com.shoppinglist.shoppinglist.Services;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
-import com.shoppinglist.shoppinglist.Dtos.GetTypeCourse;
 import com.shoppinglist.shoppinglist.Dtos.ProduitCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.ProduitResponseDTO;
 import com.shoppinglist.shoppinglist.Models.Produit;
@@ -23,15 +24,20 @@ import lombok.RequiredArgsConstructor;
 public class ProduitServices {
     private final ProduitRepository produitRepository;
     private final TypesCoursesRepository typesCoursesRepository;
+    private final CurrencyService currencyService;
+    private final UsersServices usersServices;
+
+    private static final Currency BASE_CURRENCY = Currency.getInstance("EUR");
 
     // je récupère tout les produits
 
     public List<ProduitResponseDTO> getAllProduits(String email) {
+        Currency userCurrency = usersServices.getUserCurrency(email);
         return produitRepository.findAll()
                 .stream()
                 .filter(p -> p.getTypeDeCourse() != null && p.getTypeDeCourse().getUser() != null
                         && p.getTypeDeCourse().getUser().getEmail().equals(email))
-                .map(this::convertToResponseDTO)
+                .map(produit -> toResponseDTO(produit, userCurrency))
                 .toList();
     }
 
@@ -44,7 +50,8 @@ public class ProduitServices {
                 && !produit.getTypeDeCourse().getUser().getEmail().equals(email)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
         }
-        return convertToResponseDTO(produit);
+        Currency userCurrency = usersServices.getUserCurrency(email);
+        return toResponseDTO(produit, userCurrency);
     }
 
     // faire un post
@@ -60,16 +67,18 @@ public class ProduitServices {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
         }
 
+        Currency userCurrency = typeDeCourse.getUser().getCurrency();
+
         Produit produit = new Produit();
         produit.setName(produitCreateDTO.getName());
-        produit.setPrix(produitCreateDTO.getPrix());
+        produit.setPrix(currencyService.convert(produitCreateDTO.getPrix(), userCurrency, BASE_CURRENCY));
         produit.setUpdatedAt(OffsetDateTime.now());
         produit.setCreatedAt(OffsetDateTime.now());
         produit.setTypeDeCourse(typeDeCourse);
 
         // je flush
         Produit CreatedProduit = produitRepository.save(produit);
-        return convertToResponseDTO(CreatedProduit);
+        return toResponseDTO(CreatedProduit, userCurrency);
     }
 
     // modifier un produit
@@ -83,12 +92,14 @@ public class ProduitServices {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à ce produit");
         }
 
+        Currency userCurrency = produit.getTypeDeCourse().getUser().getCurrency();
+
         produit.setName(produitDetailsDTO.getName());
-        produit.setPrix(produitDetailsDTO.getPrix());
+        produit.setPrix(currencyService.convert(produitDetailsDTO.getPrix(), userCurrency, BASE_CURRENCY));
         produit.setUpdatedAt(OffsetDateTime.now());
 
         Produit updatedProduits = produitRepository.save(produit);
-        return convertToResponseDTO(updatedProduits);
+        return toResponseDTO(updatedProduits, userCurrency);
     }
 
     // supprimer un produit on met void car la suppression ne retourne rien
@@ -114,29 +125,33 @@ public class ProduitServices {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé à cette liste");
         }
 
+        Currency userCurrency = typeDeCourse.getUser().getCurrency();
+
         return produitRepository.findByTypeDeCourseId(listId)
                 .stream()
-                .map(this::convertToResponseDTO)
+                .map(produit -> toResponseDTO(
+                        produit,
+                        userCurrency))
                 .toList();
     }
 
-    // Mapping du DTO
-    private ProduitResponseDTO convertToResponseDTO(Produit produit) {
-        GetTypeCourse dtoTypeCourse = null;
+    // Mapping du DTO : conversion du prix de la devise de base vers la devise
+    // cible
+    public ProduitResponseDTO toResponseDTO(
+            Produit produit,
+            Currency targetCurrency) {
 
-        if (produit.getTypeDeCourse() != null) {
-            dtoTypeCourse = new GetTypeCourse(
-                    produit.getTypeDeCourse().getId(),
-                    produit.getTypeDeCourse().getName());
-        }
+        BigDecimal prixConverti = currencyService.convert(
+                produit.getPrix(),
+                BASE_CURRENCY,
+                targetCurrency);
 
         return new ProduitResponseDTO(
                 produit.getId(),
                 produit.getName(),
-                produit.getPrix(),
+                prixConverti,
                 produit.getCreatedAt(),
                 produit.getUpdatedAt());
-
     }
 
 }

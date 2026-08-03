@@ -28,6 +28,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.core.Authentication;
+
+import com.shoppinglist.shoppinglist.Dtos.CurrencyDTO;
+import com.shoppinglist.shoppinglist.Dtos.CurrencyUpdateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserResponseDTO;
 
@@ -49,7 +52,8 @@ public class UsersController {
         @ApiResponse(responseCode = "403", description = "Accès refusé à l'énumération globale des utilisateurs")
         public List<UserResponseDTO> getUsers() {
                 throw new org.springframework.web.server.ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "Accès refusé : L'énumération globale des utilisateurs est interdite pour des raisons de sécurité.");
+                                HttpStatus.FORBIDDEN,
+                                "Accès refusé : L'énumération globale des utilisateurs est interdite pour des raisons de sécurité.");
         }
 
         /**
@@ -150,4 +154,28 @@ public class UsersController {
                 usersServices.deleteUserById(id);
                 return ResponseEntity.noContent().build();
         }
+
+        /**
+         * ENDPOINT POUR LISTER LES DEVISES
+         */
+        @GetMapping("/currencies")
+        public List<CurrencyDTO> getCurrencies() {
+                return usersServices.getCurrencies();
+        }
+
+        /**
+         * ENDPOINT POUR METTRE A JOUR LA DEVISE DE L'UTILISATEUR CONNECTE
+         */
+        @PutMapping("/me/currency")
+        @Operation(summary = "Met à jour la devise de l'utilisateur connecté")
+        @ApiResponse(responseCode = "200", description = "Devise mise à jour avec succès", content = @Content(schema = @Schema(implementation = UserResponseDTO.class)))
+        public ResponseEntity<UserResponseDTO> updateMyCurrency(
+                        @Valid @RequestBody CurrencyUpdateDTO currencyUpdateDTO,
+                        Authentication authentication) {
+                UserResponseDTO updatedUser = usersServices.updateUserCurrency(
+                                authentication.getName(),
+                                currencyUpdateDTO.getCode());
+                return ResponseEntity.ok(updatedUser);
+        }
+
 }

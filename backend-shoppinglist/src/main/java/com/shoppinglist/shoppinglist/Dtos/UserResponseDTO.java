@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Currency;
 import java.util.UUID;
-import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -17,5 +18,5 @@ public class UserResponseDTO {
     private String lname;
     private String pseudo;
     private String email;
-
+    private Currency currency;
 }
