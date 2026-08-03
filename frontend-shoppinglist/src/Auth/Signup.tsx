@@ -56,10 +56,11 @@ export default function Signup() {
       console.log('Succès', response)
       toast.success("Inscription faite avec succès.")
       navigate('/login')
-    } catch (error: any) {
-      const statusCode = error?.response?.status;
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      const statusCode = err?.response?.status;
       console.log("Erreur d'inscription : ", error)
-      const errorMessage = error?.response?.data?.message ?? error?.message ?? "Erreur d'inscription";
+      const errorMessage = err?.response?.data?.message ?? err?.message ?? "Erreur d'inscription";
 
       if(statusCode === 400 || errorMessage.includes("Cet email est déja utilisé")){
         toast.error("Cet email est déja utilisé")

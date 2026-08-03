@@ -4,7 +4,7 @@ export interface User {
   lname: string;     
   pseudo: string;
   email: string;
-  role: 'USER';
+  currency: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -21,4 +21,12 @@ export interface SignupFormValues {
   email: string;
   password: string;
   confirmPassword: string;
+}
+
+export interface UserUpdateValues {
+  name: string;
+  lname: string;
+  pseudo: string;
+  email: string;
+  currency: string;
 }

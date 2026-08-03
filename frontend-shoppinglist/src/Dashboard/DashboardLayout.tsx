@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Navigate, Outlet, useNavigate, useLocation, Link, } from 'react-router-dom'
+import { Navigate, Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import authService from '../Services/auth'
 import type { User } from '../types'
 
 const navigation = [
   { label: 'Mes listes', key: 'dashboard', href: '/dashboard' },
   { label: 'Créer une liste', key: 'create-list', href: '/dashboard/create-type-course' },
+  { label: 'Profil', key: 'profil', href: '/dashboard/profil' },
 ]
 
 export default function DashboardLayout() {

@@ -43,6 +43,8 @@ export function AuthField({
           {...registration}
           className="w-full bg-transparent text-textPrimary outline-none placeholder:text-slate-400"
         />
+
+       
       </span>
       {error?.message && <span className="text-xs font-semibold text-danger">{error.message}</span>}
     </label>
