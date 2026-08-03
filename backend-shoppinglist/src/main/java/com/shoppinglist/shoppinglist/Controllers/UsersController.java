@@ -33,6 +33,7 @@ import com.shoppinglist.shoppinglist.Dtos.CurrencyDTO;
 import com.shoppinglist.shoppinglist.Dtos.CurrencyUpdateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserResponseDTO;
+import com.shoppinglist.shoppinglist.Dtos.UserUpdateDTO;
 
 import jakarta.validation.Valid;
 
@@ -153,6 +154,24 @@ public class UsersController {
                 }
                 usersServices.deleteUserById(id);
                 return ResponseEntity.noContent().build();
+        }
+
+        /**
+         * PUT /api/users/me - Met à jour les informations de l'utilisateur connecté
+         */
+        @PutMapping("/me")
+        @Operation(summary = "Met à jour l'utilisateur connecté", description = "Modifie les informations de l'utilisateur authentifié")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Utilisateur mis à jour avec succès", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+                        @ApiResponse(responseCode = "400", description = "Données invalides")
+        })
+        public ResponseEntity<UserResponseDTO> updateCurrentUser(
+                        @Valid @RequestBody UserUpdateDTO userUpdateDTO,
+                        Authentication authentication) {
+                UserResponseDTO updatedUser = usersServices.updateCurrentUser(
+                                authentication.getName(),
+                                userUpdateDTO);
+                return ResponseEntity.ok(updatedUser);
         }
 
         /**

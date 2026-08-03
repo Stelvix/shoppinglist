@@ -13,6 +13,7 @@ import com.shoppinglist.shoppinglist.Repository.UsersRepository;
 import com.shoppinglist.shoppinglist.Models.User;
 import com.shoppinglist.shoppinglist.Dtos.UserCreateDTO;
 import com.shoppinglist.shoppinglist.Dtos.UserResponseDTO;
+import com.shoppinglist.shoppinglist.Dtos.UserUpdateDTO;
 import com.shoppinglist.shoppinglist.Dtos.CurrencyDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -35,13 +36,21 @@ public class UsersServices {
 
     // service get toutes currencies pouřle selecty dans le front
     public List<CurrencyDTO> getCurrencies() {
-        return Currency.getAvailableCurrencies()
-                .stream()
-                .map(
-                        currency -> new CurrencyDTO(
-                                currency.getCurrencyCode(),
-                                currency.getDisplayName(),
-                                currency.getSymbol()))
+        // Liste des devises proposées dans le front (courantes, style XE.com)
+        List<String> codes = List.of(
+                "EUR", "USD", "XOF", "XAF", "GHS", "NGN", "GMD", "SLL", "GNF",
+                "GBP", "JPY", "CAD", "AUD", "CHF", "CNY", "MAD", "INR", "BRL",
+                "ZAR", "TRY", "SEK", "NOK", "DKK", "PLN", "AED", "SAR", "EGP",
+                "KES", "THB", "KRW", "SGD", "MXN");
+
+        return codes.stream()
+                .map(code -> {
+                    Currency currency = Currency.getInstance(code);
+                    return new CurrencyDTO(
+                            currency.getCurrencyCode(),
+                            currency.getDisplayName(),
+                            currency.getSymbol());
+                })
                 .toList();
     }
 
@@ -135,6 +144,21 @@ public class UsersServices {
         User user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
         return convertToResponseDTO(user);
+    }
+
+    // Met à jour les informations de l'utilisateur connecté
+    public UserResponseDTO updateCurrentUser(String email, UserUpdateDTO userUpdateDTO) {
+        User user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+
+        user.setName(userUpdateDTO.getName());
+        user.setLname(userUpdateDTO.getLname());
+        user.setPseudo(userUpdateDTO.getPseudo());
+        user.setEmail(userUpdateDTO.getEmail());
+        user.setUpdatedAt(OffsetDateTime.now());
+
+        User updatedUser = usersRepository.save(user);
+        return convertToResponseDTO(updatedUser);
     }
 
     // Mapping du DTO: Conversion des entités en DTO
