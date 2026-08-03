@@ -102,14 +102,6 @@ export default function Login() {
               />
 
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 font-medium text-textSecondary">
-                  <input type="checkbox" className="h-4 w-4 rounded border-slate-300 accent-primary" {...register('remember')} />
-                  Se souvenir de moi
-                </label>
-                <a href="#" className="font-bold text-primary">Mot de passe oublie</a>
-              </div>
-
               <button
                 disabled={isSubmitting}
                 className="mt-2 rounded-xl bg-primary px-5 py-3.5 text-sm font-black text-white shadow-sm shadow-blue-200 transition hover:bg-primaryDark disabled:cursor-not-allowed disabled:opacity-70"
@@ -135,7 +127,7 @@ export default function Login() {
               Vos listes vous attendent
             </p>
             <h2 className="text-5xl font-black leading-tight tracking-tight">
-              Reprenez vos courses la ou vous les avez laissees.
+              Reprenez vos courses la ou vous les avez laissées.
             </h2>
             <p className="mt-5 text-lg leading-8 text-blue-50">
               Connectez-vous pour retrouver vos listes, vos produits et vos totaux estimes.
