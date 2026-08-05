@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import authService from '../Services/auth'
+import InstallPrompt from '../Composables/InstallPrompt'
+
 import type { User } from '../types'
 
 const navigation = [
@@ -22,6 +24,8 @@ export default function DashboardLayout() {
         setLoading(false)
         return
       }
+       
+
 
       try {
         const details = await authService.getCurrentUser()
@@ -50,7 +54,7 @@ export default function DashboardLayout() {
   if (!authService.isAuthenticated() || !user) {
     return <Navigate to="/login" replace state={{ from: location }} />
   }
-
+ 
   return (
     <div className="min-h-screen bg-slate-100 text-textPrimary">
       <div className="mx-auto min-h-screen max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
@@ -116,6 +120,7 @@ export default function DashboardLayout() {
           </aside>
         </main>
       </div>
+      <InstallPrompt />
     </div>
   )
 }
