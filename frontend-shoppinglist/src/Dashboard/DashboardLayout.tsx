@@ -18,6 +18,7 @@ export default function DashboardLayout() {
   useEffect(() => {
     const fetchUser = async () => {
       if (!authService.isAuthenticated()) {
+        authService.logout()
         setLoading(false)
         return
       }
